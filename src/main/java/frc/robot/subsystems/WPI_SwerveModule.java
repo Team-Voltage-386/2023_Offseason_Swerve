@@ -75,7 +75,6 @@ public class WPI_SwerveModule extends SubsystemBase{
         // updateShufflables();
     }
 
-    //WPI Additions
     public double getTurnEncPosition() {
         return turningEncoder.getAbsolutePosition() - encoderOffs;
     }
@@ -97,7 +96,8 @@ public class WPI_SwerveModule extends SubsystemBase{
     }
 
     public SwerveModulePosition getSwerveModulePosition() {
-        swerveModulePosition = new SwerveModulePosition(4*Math.PI*getDriveEncPosition(), new Rotation2d(getTurnEncPosition()));
+        //2*Pi*r (r = radius of wheels = 2 in)
+        swerveModulePosition = new SwerveModulePosition(DriveConstants.kWheelRadiusMeters*2*Math.PI*getDriveEncPosition(), new Rotation2d(getTurnEncPosition()));
         return swerveModulePosition;
     }
 

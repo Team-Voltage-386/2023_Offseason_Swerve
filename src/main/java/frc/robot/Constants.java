@@ -91,15 +91,20 @@ public final class Constants {
                                 kSwerveDrivePID, 22, 43.2, "RR");
 
                 //WPI SwerveDriveKineMatics
+                public static final double kWheelRadiusMeters = 0.0508;
+                //Wheel Radius in Meters (2 inches)
                 public static final double kDistBetweenLeftRightWheels = 0.52705;
                 // Distance between right and left wheels
                 public static final double kDistBetweenFrontBackWheels = 0.73025;
+
                 // Distance between front and back wheels
+                //FOUND IT !!!!!!!!!!!!!!!!!!!!!!!!!!
+                //LEFTFRONT, RIGHTFRONT, LEFTBACK, RIGHTBACK
                 public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-                new Translation2d(kDistBetweenFrontBackWheels / 2, -kDistBetweenLeftRightWheels / 2),
-                new Translation2d(kDistBetweenFrontBackWheels / 2, kDistBetweenLeftRightWheels / 2),
-                new Translation2d(-kDistBetweenFrontBackWheels / 2, -kDistBetweenLeftRightWheels / 2),
-                new Translation2d(-kDistBetweenFrontBackWheels / 2, kDistBetweenLeftRightWheels / 2));
+                new Translation2d(-kDistBetweenLeftRightWheels / 2, kDistBetweenFrontBackWheels / 2),
+                new Translation2d(kDistBetweenLeftRightWheels / 2, kDistBetweenFrontBackWheels / 2),
+                new Translation2d(-kDistBetweenLeftRightWheels / 2, -kDistBetweenFrontBackWheels / 2),
+                new Translation2d(kDistBetweenLeftRightWheels / 2, -kDistBetweenFrontBackWheels / 2));
 
         }
 }

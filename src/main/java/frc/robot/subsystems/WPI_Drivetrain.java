@@ -114,8 +114,8 @@ public class WPI_Drivetrain extends SubsystemBase{
 
     public void stopModules() {
         LeftFrontWPI.stop();
-        LeftRearWPI.stop();
         RightFrontWPI.stop();
+        LeftRearWPI.stop();
         RightRearWPI.stop();
     }
 
