@@ -61,18 +61,18 @@ public class RobotContainer {
 
         
 
-        // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
-        // SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-        //     m_driveTrain::getPose, // Pose2d supplier
-        //     m_driveTrain::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
-        //     kDriveKinematics, // SwerveDriveKinematics
-        //     new PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-        //     new PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-        //     m_driveTrain::setModuleStates, // Module states consumer used to output to the drive subsystem
-        //     kEventMap,
-        //     true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-        //     m_driveTrain // The drive subsystem. Used to properly set the requirements of path following commands
-        // );
+        //Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
+        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
+            m_driveTrain::getPose, // Pose2d supplier
+            m_driveTrain::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
+            kDriveKinematics, // SwerveDriveKinematics
+            new PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+            new PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+            m_driveTrain::setModuleStates, // Module states consumer used to output to the drive subsystem
+            kEventMap,
+            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+            m_driveTrain // The drive subsystem. Used to properly set the requirements of path following commands
+        );
 
         double[] maxVelo = {4, 4, 4, 4};
         double[] maxAccel = {3, 1, 3, 2};
