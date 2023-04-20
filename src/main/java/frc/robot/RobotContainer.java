@@ -76,7 +76,7 @@ public class RobotContainer {
 
         double[] maxVelo = {4, 4, 4, 4};
         double[] maxAccel = {3, 1, 3, 2};
-        //Command pg1 = autoBuilder.fullAuto(PGU.generatePathGroup("Path Group 1", maxVelo, maxAccel));
+        Command pg1 = autoBuilder.fullAuto(PGU.generatePathGroup("Path Group 1", maxVelo, maxAccel));
 
         PathPlannerTrajectory TestPath = PathPlanner.loadPath("Test Path 1", new PathConstraints(4, 3));
 
