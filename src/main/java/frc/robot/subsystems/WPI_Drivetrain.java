@@ -106,6 +106,7 @@ public class WPI_Drivetrain extends SubsystemBase{
             modulePositions[i] = modules[i].getSwerveModulePosition();
         }
         odometer.update(getHeadingRotation2d(), modulePositions);
+        System.out.println("Robot Position: (" + odometer.getPoseMeters().getX() + "," + odometer.getPoseMeters().getY() + ")");
 
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());

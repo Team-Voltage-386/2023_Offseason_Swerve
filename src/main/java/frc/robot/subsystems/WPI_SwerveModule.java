@@ -127,5 +127,4 @@ public class WPI_SwerveModule extends SubsystemBase{
         driveMotor.set(0);
         turningMotor.set(0);
     }
-
 }
