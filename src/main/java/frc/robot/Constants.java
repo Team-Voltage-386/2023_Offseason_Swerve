@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.WPI_SwerveModule;;
@@ -91,13 +92,13 @@ public final class Constants {
                                 kSwerveDrivePID, 22, 43.2, "RR");
 
                 //WPI SwerveDriveKineMatics
-                public static final double kWheelRadiusMeters = 0.0508;
+                public static final double kWheelRadiusMeters = Units.inchesToMeters(2);
                 //Wheel Radius in Meters (2 inches)
                 public static final double kDistBetweenLeftRightWheels = 0.52705;
                 // Distance between right and left wheels
                 public static final double kDistBetweenFrontBackWheels = 0.73025;
-
                 // Distance between front and back wheels
+                
                 //FOUND IT !!!!!!!!!!!!!!!!!!!!!!!!!!
                 //LEFTFRONT, RIGHTFRONT, LEFTBACK, RIGHTBACK
                 public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(

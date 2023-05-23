@@ -45,7 +45,7 @@ public class WPI_Drivetrain extends SubsystemBase{
 
     public WPI_Drivetrain() {
         //waits for gyro to calibrate before zeroing it.
-        //does this on a different thread as to no interupt current code.
+        //does this on a different thread as to not interupt current code.
         new Thread(() -> {
             try {
                 Thread.sleep(1000);

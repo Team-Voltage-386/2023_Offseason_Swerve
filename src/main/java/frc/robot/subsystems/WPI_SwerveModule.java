@@ -24,7 +24,6 @@ public class WPI_SwerveModule extends SubsystemBase{
     public final PIDController turningPIDController;
     public final PIDController drivePIDController;
     public final double encoderOffs;
-    public double angleFromCenter;
     public double distFromCenter;
     public SwerveModulePosition swerveModulePosition;
 
@@ -40,6 +39,7 @@ public class WPI_SwerveModule extends SubsystemBase{
     public final GenericEntry driveMotorCurrentWidget;
     public final GenericEntry driveMotorSetWidget;
     public final GenericEntry posiitonWidget;
+    public final GenericEntry MotorPositionWidget;
 
     public WPI_SwerveModule(int STEERMOTOR, int DRIVEMOTOR, double driveConversion, double[] steerPIDValue,
             double[] drivePIDValue, int encoderID, double ENCOFFS, String SwerveModuleName) {
@@ -70,9 +70,16 @@ public class WPI_SwerveModule extends SubsystemBase{
                 .getEntry();
         driveMotorSetWidget = swerveTab.add("dmSET" + SwerveModuleName, 0).withPosition(8, swerveModuleID).withSize(1, 1)
                 .getEntry();
+        MotorPositionWidget = swerveTab.add("Module Position" + SwerveModuleName, 0).withPosition(9, swerveModuleID).withSize(1, 1)
+                .getEntry();
         swerveModuleCount++;
-
+        resetEncoders();
         // updateShufflables();
+    }
+
+    public void resetEncoders() {
+        driveMotor.getEncoder().setPosition(0);
+        turningEncoder.setPosition(getTurnEncPosition());
     }
 
     public double getTurnEncPosition() {
@@ -97,8 +104,12 @@ public class WPI_SwerveModule extends SubsystemBase{
 
     public SwerveModulePosition getSwerveModulePosition() {
         //2*Pi*r (r = radius of wheels = 2 in)
-        swerveModulePosition = new SwerveModulePosition(DriveConstants.kWheelRadiusMeters*2*Math.PI*getDriveEncPosition(), new Rotation2d(getTurnEncPosition()));
+        swerveModulePosition = new SwerveModulePosition(getWheelPositionMeters(), new Rotation2d(getTurnEncPosition()));
         return swerveModulePosition;
+    }
+
+    public double getWheelPositionMeters() {
+        return DriveConstants.kWheelRadiusMeters*2*Math.PI*getDriveEncPosition();
     }
 
     public void setDesiredState(SwerveModuleState state) {
