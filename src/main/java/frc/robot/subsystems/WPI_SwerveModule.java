@@ -103,7 +103,7 @@ public class WPI_SwerveModule extends SubsystemBase{
 
     public void setDesiredState(SwerveModuleState state) {
         //if let go of stick, drift for a bit
-        if(Math.abs(state.speedMetersPerSecond) < 0.005) {
+        if(Math.abs(state.speedMetersPerSecond) < 0.01) {
             stop();
             return;
         }
