@@ -106,10 +106,14 @@ public class WPI_Drivetrain extends SubsystemBase{
             modulePositions[i] = modules[i].getSwerveModulePosition();
         }
         odometer.update(getHeadingRotation2d(), modulePositions);
-        System.out.println("Robot Position: (" + odometer.getPoseMeters().getX() + "," + odometer.getPoseMeters().getY() + ")");
+        //System.out.println("Robot Position: (" + odometer.getPoseMeters().getX() + "," + odometer.getPoseMeters().getY() + ")");
 
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        for(int i = 0; i < modules.length; i++) {
+            SmartDashboard.putNumber("Wheel distance of module " + i, modules[i].getWheelPositionMeters());
+            SmartDashboard.putNumber("Drive Enc Reading of module " + i, modules[i].getDriveEncPosition());
+        }
         gyro.getYawPitchRoll(ypr);
     }
 

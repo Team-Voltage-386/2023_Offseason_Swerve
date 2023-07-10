@@ -66,6 +66,8 @@ public final class Constants {
   /** Can IDs, PID values, ect. */
         public static final class DriveConstants {
 
+                public static final double kSteerMotorGearRatio = 150/7;
+
                 public static final double kMaxRotSpeed = 180;
                 public static final double kMaxDriveSpeed = 4;
                 public static final double kMaxDriveAccel = 3;

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // import frc.robot.utils.PIDShufflable;
@@ -21,6 +23,7 @@ public class WPI_SwerveModule extends SubsystemBase{
     public final CANSparkMax turningMotor;
     public final CANSparkMax driveMotor;
     public final CANCoder turningEncoder;
+    public final RelativeEncoder driveEncoder;
     public final PIDController turningPIDController;
     public final PIDController drivePIDController;
     public final double encoderOffs;
@@ -50,8 +53,9 @@ public class WPI_SwerveModule extends SubsystemBase{
         drivePIDController = new PIDController(drivePIDValue[0], drivePIDValue[1], drivePIDValue[2]);
         turningMotor = new CANSparkMax(STEERMOTOR, MotorType.kBrushless);
         driveMotor = new CANSparkMax(DRIVEMOTOR, MotorType.kBrushless);
-        driveMotor.getEncoder().setPositionConversionFactor(driveConversion);
-        driveMotor.getEncoder().setVelocityConversionFactor(driveConversion);
+        driveEncoder = driveMotor.getEncoder();
+        // driveEncoder.setPositionConversionFactor(driveConversion);
+        // driveEncoder.setVelocityConversionFactor(driveConversion);
         turningEncoder = new CANCoder(encoderID);
         swerveModulePosition = this.getSwerveModulePosition();
 
@@ -78,16 +82,20 @@ public class WPI_SwerveModule extends SubsystemBase{
     }
 
     public void resetEncoders() {
-        driveMotor.getEncoder().setPosition(0);
-        turningEncoder.setPosition(getTurnEncPosition());
+        driveEncoder.setPosition(0);
+        turningEncoder.setPosition(0);
     }
 
-    public double getTurnEncPosition() {
+    public double getTurnEncPositionDeg() {
         return turningEncoder.getAbsolutePosition() - encoderOffs;
     }
 
+    // public double getWheelRotation() {
+    //     return getTurnEncPositionDeg()/DriveConstants.kSteerMotorGearRatio;
+    // }
+
     public double getDriveEncPosition() {
-        return driveMotor.getEncoder().getPosition();
+        return driveEncoder.getPosition();
     }
 
     public double getTurnEncVelocity() {
@@ -95,20 +103,20 @@ public class WPI_SwerveModule extends SubsystemBase{
     }
 
     public double getDriveEncVelocity() {
-        return driveMotor.getEncoder().getVelocity();
+        return driveEncoder.getVelocity();
     }
 
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getDriveEncVelocity(), new Rotation2d(getTurnEncPosition()));
+        return new SwerveModuleState(getDriveEncVelocity(), new Rotation2d(Math.toRadians(getTurnEncPositionDeg())));
     }
 
     public SwerveModulePosition getSwerveModulePosition() {
-        //2*Pi*r (r = radius of wheels = 2 in)
-        swerveModulePosition = new SwerveModulePosition(getWheelPositionMeters(), new Rotation2d(getTurnEncPosition()));
+        swerveModulePosition = new SwerveModulePosition(getWheelPositionMeters(), new Rotation2d(Math.toRadians(getTurnEncPositionDeg())));
         return swerveModulePosition;
     }
 
     public double getWheelPositionMeters() {
+        //2*Pi*r (r = radius of wheels = 2 in)
         return DriveConstants.kWheelRadiusMeters*2*Math.PI*getDriveEncPosition();
     }
 
@@ -120,11 +128,17 @@ public class WPI_SwerveModule extends SubsystemBase{
         }
         state = SwerveModuleState.optimize(state, getState().angle);
         driveMotor.set(state.speedMetersPerSecond / DriveConstants.kMaxDriveSpeed);
-        turningMotor.set(turningPIDController.calculate(getTurnEncPosition(), state.angle.getDegrees()));
+        turningMotor.set(turningPIDController.calculate(getTurnEncPositionDeg(), state.angle.getDegrees()));
     }
 
     public void stop() {
         driveMotor.set(0);
         turningMotor.set(0);
+    }
+
+    @Override
+    public void periodic() {
+        steerMotorCurrentWidget.setDouble(getTurnEncPositionDeg());
+        driveMotorCurrentWidget.setDouble(getDriveEncPosition());
     }
 }

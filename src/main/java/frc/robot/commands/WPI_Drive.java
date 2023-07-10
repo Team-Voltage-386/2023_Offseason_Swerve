@@ -50,8 +50,8 @@ public class WPI_Drive extends CommandBase{
         turningSpeed = Math.abs(turningSpeed) > kJoyStickDeadzone ? turningSpeed : 0.0;
 
         //rate limiter so stuff isnt jerky
-        xSpeed = xLimiter.calculate(xSpeed)*kMaxDriveSpeed/4;
-        ySpeed = yLimiter.calculate(ySpeed)*kMaxDriveSpeed/4;
+        xSpeed = xLimiter.calculate(xSpeed)*kMaxDriveSpeed;
+        ySpeed = yLimiter.calculate(ySpeed)*kMaxDriveSpeed;
         turningSpeed = turningLimiter.calculate(turningSpeed)*kMaxRotSpeed/4;
 
         //Construct chassis speeds
