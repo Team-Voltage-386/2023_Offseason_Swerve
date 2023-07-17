@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -20,8 +21,10 @@ import frc.robot.Constants.DriveConstants;
 
 public class WPI_SwerveModule extends SubsystemBase{
 
-    public final CANSparkMax turningMotor;
     public final CANSparkMax driveMotor;
+    public final CANSparkMax turningMotor;
+
+    public final RelativeEncoder driveEncoder;
     public final CANCoder turningEncoder;
     public final PIDController turningPIDController;
     public final PIDController drivePIDController;
@@ -54,6 +57,7 @@ public class WPI_SwerveModule extends SubsystemBase{
         driveMotor = new CANSparkMax(DRIVEMOTOR, MotorType.kBrushless);
         driveMotor.getEncoder().setPositionConversionFactor(driveConversion);
         driveMotor.getEncoder().setVelocityConversionFactor(driveConversion);
+        driveEncoder = driveMotor.getEncoder();
         turningEncoder = new CANCoder(encoderID);
         swerveModulePosition = this.getSwerveModulePosition();
 
