@@ -23,7 +23,6 @@ public class WPI_SwerveModule extends SubsystemBase{
     public final CANSparkMax turningMotor;
     public final CANSparkMax driveMotor;
     public final CANCoder turningEncoder;
-    public final RelativeEncoder driveEncoder;
     public final PIDController turningPIDController;
     public final PIDController drivePIDController;
     public final double encoderOffs;
@@ -53,9 +52,8 @@ public class WPI_SwerveModule extends SubsystemBase{
         drivePIDController = new PIDController(drivePIDValue[0], drivePIDValue[1], drivePIDValue[2]);
         turningMotor = new CANSparkMax(STEERMOTOR, MotorType.kBrushless);
         driveMotor = new CANSparkMax(DRIVEMOTOR, MotorType.kBrushless);
-        driveEncoder = driveMotor.getEncoder();
-        // driveEncoder.setPositionConversionFactor(driveConversion);
-        // driveEncoder.setVelocityConversionFactor(driveConversion);
+        driveMotor.getEncoder().setPositionConversionFactor(driveConversion);
+        driveMotor.getEncoder().setVelocityConversionFactor(driveConversion);
         turningEncoder = new CANCoder(encoderID);
         swerveModulePosition = this.getSwerveModulePosition();
 
@@ -82,7 +80,7 @@ public class WPI_SwerveModule extends SubsystemBase{
     }
 
     public void resetEncoders() {
-        driveEncoder.setPosition(0);
+        driveMotor.getEncoder().setPosition(0);
         turningEncoder.setPosition(0);
     }
 
@@ -95,7 +93,7 @@ public class WPI_SwerveModule extends SubsystemBase{
     // }
 
     public double getDriveEncPosition() {
-        return driveEncoder.getPosition();
+        return driveMotor.getEncoder().getPosition();
     }
 
     public double getTurnEncVelocity() {
@@ -103,7 +101,7 @@ public class WPI_SwerveModule extends SubsystemBase{
     }
 
     public double getDriveEncVelocity() {
-        return driveEncoder.getVelocity();
+        return driveMotor.getEncoder().getVelocity();
     }
 
     public SwerveModuleState getState() {
