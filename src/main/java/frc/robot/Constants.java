@@ -77,7 +77,7 @@ public final class Constants {
                 public static final int kIMUid = 2;
                 public static final double[] kSwerveSteerPID = { 0.006, 0.01, 0.0 }; // 0.01,0.0,0.001
                 public static final double[] kSwerveDrivePID = { 0.3, 2, 1 }; // 0.35,2,0.01
-                public static final double kSwerveDriveEncConv = 0.00745*4.5;
+                public static final double kSwerveDriveEncConv = 0.00745*5;
 
                 //WPISwerves
                 public static final WPI_SwerveModule LeftFrontWPI = new WPI_SwerveModule(14, 18, kSwerveDriveEncConv,
