@@ -45,6 +45,7 @@ public class WPI_SwerveModule extends SubsystemBase{
     public final GenericEntry driveMotorSetWidget;
     public final GenericEntry posiitonWidget;
     public final GenericEntry MotorPositionWidget;
+    public final GenericEntry DrivespeedWidget;
 
     public WPI_SwerveModule(int STEERMOTOR, int DRIVEMOTOR, double driveConversion, double[] steerPIDValue,
             double[] drivePIDValue, int encoderID, double ENCOFFS, String SwerveModuleName) {
@@ -77,6 +78,8 @@ public class WPI_SwerveModule extends SubsystemBase{
         driveMotorSetWidget = swerveTab.add("dmSET" + SwerveModuleName, 0).withPosition(8, swerveModuleID).withSize(1, 1)
                 .getEntry();
         MotorPositionWidget = swerveTab.add("Module Position" + SwerveModuleName, 0).withPosition(9, swerveModuleID).withSize(1, 1)
+                .getEntry();
+        DrivespeedWidget = swerveTab.add(SwerveModuleName + "Drive speed", 0).withPosition(10, swerveModuleID).withSize(1, 1)
                 .getEntry();
         swerveModuleCount++;
         resetEncoders();
@@ -128,9 +131,14 @@ public class WPI_SwerveModule extends SubsystemBase{
             stop();
             return;
         }
+        //could be causing problem
         state = SwerveModuleState.optimize(state, getState().angle);
+        //state = SwerveModuleState.optimize(state, new Rotation2d(Math.toRadians(this.getTurnEncPositionDeg())));
         driveMotor.set(state.speedMetersPerSecond / DriveConstants.kMaxDriveSpeed);
+
         turningMotor.set(turningPIDController.calculate(getTurnEncPositionDeg(), state.angle.getDegrees()));
+
+        DrivespeedWidget.setDouble(turningPIDController.calculate(getTurnEncPositionDeg(), state.angle.getDegrees()));
     }
 
     public void stop() {

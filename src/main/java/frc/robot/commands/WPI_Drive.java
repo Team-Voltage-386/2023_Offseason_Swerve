@@ -52,8 +52,10 @@ public class WPI_Drive extends CommandBase{
         //rate limiter so stuff isnt jerky
         xSpeed = xLimiter.calculate(xSpeed)*kMaxDriveSpeed;
         ySpeed = yLimiter.calculate(ySpeed)*kMaxDriveSpeed;
-        turningSpeed = turningLimiter.calculate(turningSpeed)*kMaxRotSpeed/4;
+        turningSpeed = turningLimiter.calculate(turningSpeed)*kMaxRotSpeed;
 
+        System.out.println(turningSpdFunction.get() + turningSpeed);
+        
         //Construct chassis speeds
         ChassisSpeeds chassisSpeeds;
         if(fieldOrientedFunction.get()) {
