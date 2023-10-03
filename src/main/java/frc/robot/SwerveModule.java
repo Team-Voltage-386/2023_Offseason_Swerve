@@ -77,7 +77,8 @@ public class SwerveModule {
 
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
-
+        
+        // may need to turn PosConvFactor off (comment it out) when performing the alternative math calculation of wheel distance
         m_driveMotor.getEncoder().setPositionConversionFactor(kSwerveDriveEncConv);
         m_driveMotor.getEncoder().setVelocityConversionFactor(kSwerveDriveEncConv);
 

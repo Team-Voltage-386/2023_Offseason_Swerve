@@ -35,20 +35,24 @@ public class Drivetrain {
       new SwerveDriveKinematics(
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-//   private final SwerveDriveOdometry m_odometry =
-//       new SwerveDriveOdometry(
-//           m_kinematics,
-//           m_gyro.getRotation2d(),
-//           new SwerveModulePosition[] {
-//             m_frontLeft.getPosition(),
-//             m_frontRight.getPosition(),
-//             m_backLeft.getPosition(),
-//             m_backRight.getPosition()
-//           });
+  private final SwerveDriveOdometry m_odometry =
+      new SwerveDriveOdometry(
+          m_kinematics,
+          getGyroYawRotation2d(),
+          new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_backLeft.getPosition(),
+            m_backRight.getPosition()
+          });
 
   public Drivetrain() {
     // m_gyro.reset();
     m_gyro.zeroGyroBiasNow();
+  }
+
+  public Rotation2d getGyroYawRotation2d() {
+    return new Rotation2d(m_gyro.getYaw());
   }
 
   /**
@@ -70,25 +74,25 @@ public class Drivetrain {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
-    // for (int i = 0; i < swerveModuleStates.length; i++) {
-    //     System.out.printf("State %d: %s\n", i, swerveModuleStates[i].toString());
-    // }
+    for (int i = 0; i < swerveModuleStates.length; i++) {
+        System.out.printf("State %d: %s\n", i, swerveModuleStates[i].toString());
+    }
 
-    // m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    // m_frontRight.setDesiredState(swerveModuleStates[1]);
-    // m_backLeft.setDesiredState(swerveModuleStates[2]);
-    // m_backRight.setDesiredState(swerveModuleStates[3]);
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_backLeft.setDesiredState(swerveModuleStates[2]);
+    m_backRight.setDesiredState(swerveModuleStates[3]);
   }
 
   /** Updates the field relative position of the robot. */
-//   public void updateOdometry() {
-//     m_odometry.update(
-//         m_gyro.getRotation2d(),
-//         new SwerveModulePosition[] {
-//           m_frontLeft.getPosition(),
-//           m_frontRight.getPosition(),
-//           m_backLeft.getPosition(),
-//           m_backRight.getPosition()
-//         });
-//   }
+  public void updateOdometry() {
+    m_odometry.update(
+        getGyroYawRotation2d(),
+        new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_backLeft.getPosition(),
+          m_backRight.getPosition()
+        });
+  }
 }
