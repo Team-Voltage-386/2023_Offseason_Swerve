@@ -124,6 +124,17 @@ public class SwerveModule {
       return m_driveMotor.getEncoder().getPosition();
     }
 
+    // getActualDrivePosition with math instead of the drive conversion. should output same thing if conversion is tuned. disable PosConversion in constructor.
+//     /**
+//      * Returns rotations*2*Pi*R
+//      * gets real position the wheel thinks it has spun.
+//      * 
+//      * @return distance wheel has gone across the floor. (Circumference*rotations)
+//      */
+//     public double getActualDrivePosition() {
+//       return m_driveMotor.getEncoder().getPosition()*2*Math.PI*Units.inchesToMeters(2);
+//     }
+
     /**
      * Returns irl orientation of wheel, accounting for encoder offsets. 0 is when aligned with forward axis of the chasis.
      * 
