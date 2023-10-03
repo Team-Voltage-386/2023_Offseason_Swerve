@@ -90,27 +90,44 @@ public class SwerveModule {
         m_encoderOffset = encoderOffset;
     }
 
-    // /**
-    // * Returns the current state of the module.
-    // *
-    // * @return The current state of the module.
-    // */
-    // public SwerveModuleState getState() {
-    // return new SwerveModuleState(
-    // m_driveEncoder.getVelocity(), new
-    // Rotation2d(m_turningEncoder.getPosition()));
-    // }
+    /**
+    * Returns the current state of the module.
+    *
+    * @return The current state of the module.
+    */
+    public SwerveModuleState getState() {
+    return new SwerveModuleState(
+    m_driveMotor.getEncoder().getVelocity(), new
+    Rotation2d(getActualTurningPosition()));
+    }
 
-    // /**
-    // * Returns the current position of the module.
-    // *
-    // * @return The current position of the module.
-    // */
-    // public SwerveModulePosition getPosition() {
-    // return new SwerveModulePosition(
-    // m_driveEncoder., new Rotation2d(m_turningEncoder.getPosition()));
-    // }
+    /**
+    * Returns the current position of the module.
+    *
+    * @return The current position of the module.
+    */
+    public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(
+      getActualDrivePosition(), 
+      new Rotation2d(getActualTurningPosition()));
+    }
 
+    /**
+     * Returns m_driveMotor.getEncoder().getPosition()
+     * gets real position the wheel thinks it has spun.
+     * the PositionConversionFactor (line 81) takes # of rotations and converts it to irl distance in meters.
+     * 
+     * @return distance wheel has gone across the floor. (Circumference*rotations)
+     */
+    public double getActualDrivePosition() {
+      return m_driveMotor.getEncoder().getPosition();
+    }
+
+    /**
+     * Returns irl orientation of wheel, accounting for encoder offsets. 0 is when aligned with forward axis of the chasis.
+     * 
+     * @return real orientation of wheel.
+     */
     public double getActualTurningPosition() {
         return m_turningEncoder.getAbsolutePosition() - m_encoderOffset;
     }
