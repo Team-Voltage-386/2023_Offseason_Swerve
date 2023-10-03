@@ -51,6 +51,11 @@ public class Drivetrain {
     m_gyro.zeroGyroBiasNow();
   }
 
+
+  /**
+   * returns yaw of gyro in Rotation2d form
+   * @return chasis angle in Rotation2d
+   */
   public Rotation2d getGyroYawRotation2d() {
     return new Rotation2d(m_gyro.getYaw());
   }
@@ -69,7 +74,7 @@ public class Drivetrain {
     var swerveModuleStates =
         m_kinematics.toSwerveModuleStates(
             fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, new Rotation2d(m_gyro.getYaw()))
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getGyroYawRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
