@@ -51,8 +51,8 @@ public class SwerveModule {
                     kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 
     // Gains are for example purposes only - must be determined for your own robot!
-    private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
-    private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
+//     private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
+//     private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
 
     public static final double kSwerveDriveEncConv = 0.000745;
 
@@ -132,7 +132,7 @@ public class SwerveModule {
 //      * @return distance wheel has gone across the floor. (Circumference*rotations)
 //      */
 //     public double getActualDrivePosition() {
-//       return m_driveMotor.getEncoder().getPosition()*2*Math.PI*Units.inchesToMeters(2);
+//       return m_driveMotor.getEncoder().getPosition()*2*Math.PI*kWheelRadius;
 //     }
 
     /**
@@ -158,14 +158,14 @@ public class SwerveModule {
         final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getEncoder().getVelocity(),
                 state.speedMetersPerSecond);
 
-        // final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
+        //final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
         // Calculate the turning motor output from the turning PID controller.
         final double turnOutput = m_turningPIDController.calculate(
                 getActualTurningPosition(),
                 state.angle.getRadians());
 
-        // final double turnFeedforward = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
+        //final double turnFeedforward = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
         m_driveMotor.setVoltage(driveOutput); // + driveFeedforward);
         m_turningMotor.setVoltage(turnOutput); // + turnFeedforward);
