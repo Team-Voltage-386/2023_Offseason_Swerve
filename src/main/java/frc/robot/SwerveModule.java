@@ -84,6 +84,14 @@ public class SwerveModule {
 
         m_turningEncoder = new CANCoder(turningEncoderID);
 
+        // set units of the CANCoder to radians, with velocity being radians per second
+        CANCoderConfiguration config = new CANCoderConfiguration();
+        config.sensorCoefficient = 2 * Math.PI / kEncoderResolution;
+        config.unitString = "rad";
+        config.sensorTimeBase = SensorTimeBase.PerSecond;
+        m_turningEncoder.configAllSettings(config);
+
+
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
         m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
