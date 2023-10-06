@@ -73,7 +73,7 @@ public class SwerveModule {
             int turningEncoderID,
             double encoderOffset) {
         // The encoder: counts and measures rotation
-        // The moter: does the actual work, give it power
+        // The motor: does the actual work, give it power
 
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
@@ -83,7 +83,7 @@ public class SwerveModule {
         m_driveMotor.getEncoder().setVelocityConversionFactor(kSwerveDriveEncConv);
 
         m_turningEncoder = new CANCoder(turningEncoderID);
-
+        
         // set units of the CANCoder to radians, with velocity being radians per second
         CANCoderConfiguration config = new CANCoderConfiguration();
         config.sensorCoefficient = 2 * Math.PI / kEncoderResolution;
