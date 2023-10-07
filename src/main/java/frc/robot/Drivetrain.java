@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.Util;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,8 +12,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Represents a swerve drive style drivetrain. */
@@ -81,7 +80,7 @@ public class Drivetrain {
     SmartDashboard.putNumber("Deg Gyro angle", getGyroYawRotation2d().getDegrees());
     SmartDashboard.putNumber("Rad Gyro angle", getGyroYawRotation2d().getRadians());
 
-    var swerveModuleStates =
+    SwerveModuleState[] swerveModuleStates =
         m_kinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getGyroYawRotation2d())
@@ -93,11 +92,13 @@ public class Drivetrain {
     //     System.out.printf("State %d: %s\n", i, swerveModuleStates[i].toString());
     // }
 
+    //putting angles of swerve modules on dashboard for debbie's advantage scope and debugging.
     SmartDashboard.putNumber("LF", m_frontLeft.getActualTurningPosition());
     SmartDashboard.putNumber("RF", m_frontRight.getActualTurningPosition());
     SmartDashboard.putNumber("LB", m_backLeft.getActualTurningPosition());
     SmartDashboard.putNumber("RB", m_backRight.getActualTurningPosition());
 
+    //passing back the math from kinematics to the swerves themselves.
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_backLeft.setDesiredState(swerveModuleStates[2]);

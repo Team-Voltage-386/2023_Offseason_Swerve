@@ -4,11 +4,9 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
-import com.ctre.phoenix.sensors.CANCoderFaults;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -22,8 +20,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class SwerveModule {
     private static final double kWheelRadius = Units.inchesToMeters(2);
@@ -95,7 +91,7 @@ public class SwerveModule {
         m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         m_turningEncoder.setPosition(0.0);
         m_turningEncoder.configSensorDirection(false); //making sure its default (false is default)
-        m_turningEncoder.configMagnetOffset(-0);
+        m_turningEncoder.configMagnetOffset(-0); //I dont know why its -0 but a big thread on delhpi was saying this was correct
 
 
         // Limit the PID Controller's input range between -pi and pi and set the input
