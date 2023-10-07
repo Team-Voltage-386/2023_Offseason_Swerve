@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.CANCoderFaults;
@@ -79,8 +80,8 @@ public class SwerveModule {
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
         
         // may need to turn PosConvFactor off (comment it out) when performing the alternative math calculation of wheel distance
-        m_driveMotor.getEncoder().setPositionConversionFactor(kSwerveDriveEncConv);
-        m_driveMotor.getEncoder().setVelocityConversionFactor(kSwerveDriveEncConv);
+        //m_driveMotor.getEncoder().setPositionConversionFactor(kSwerveDriveEncConv);
+        //m_driveMotor.getEncoder().setVelocityConversionFactor(kSwerveDriveEncConv);
 
         m_turningEncoder = new CANCoder(turningEncoderID);
         
@@ -90,6 +91,11 @@ public class SwerveModule {
         config.unitString = "rad";
         config.sensorTimeBase = SensorTimeBase.PerSecond;
         m_turningEncoder.configAllSettings(config);
+        m_turningEncoder.clearStickyFaults();
+        m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+        m_turningEncoder.setPosition(0.0);
+        m_turningEncoder.configSensorDirection(false); //making sure its default (false is default)
+        m_turningEncoder.configMagnetOffset(-0);
 
 
         // Limit the PID Controller's input range between -pi and pi and set the input
@@ -128,21 +134,23 @@ public class SwerveModule {
      * 
      * @return distance wheel has gone across the floor. (Circumference*rotations)
      */
-    public double getActualDrivePosition() {
-      return m_driveMotor.getEncoder().getPosition();
-    }
+    // public double getActualDrivePosition() {
+    //   return m_driveMotor.getEncoder().getPosition();
+    // }
 
     // getActualDrivePosition with math instead of the drive conversion. should output same thing if conversion is tuned. disable PosConversion in constructor.
-//     /**
-//      * Returns rotations*2*Pi*R
-//      * gets real position the wheel thinks it has spun.
-//      * 
-//      * @return distance wheel has gone across the floor. (Circumference*rotations)
-//      */
-//     public double getActualDrivePosition() {
-//       return m_driveMotor.getEncoder().getPosition()*2*Math.PI*kWheelRadius;
-//     }
+    /**
+     * Returns rotations*2*Pi*R
+     * gets real position the wheel thinks it has spun.
+     * 
+     * @return distance wheel has gone across the floor. (Circumference*rotations)
+     */
+    public double getActualDrivePosition() {
+      return m_driveMotor.getEncoder().getPosition()*2*Math.PI*kWheelRadius;
+    }
 
+    //GET OFFSETS IN RADS
+    //MEASURING 0-2PI AND WHEN GOING PAST 2PI JUMPING BACK TO 0. WE NEED -180/180
     /**
      * Returns irl orientation of wheel, accounting for encoder offsets. 0 is when aligned with forward axis of the chasis.
      * 
