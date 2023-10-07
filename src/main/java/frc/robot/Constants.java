@@ -4,26 +4,26 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
     public static class ID {
-        //Swerve motor controller IDs
+        // Swerve motor controller IDs
         public static final int kFrontLeftTurn = 1;
         public static final int kFrontLeftDrive = 2;
 
         public static final int kFrontRightTurn = 3;
         public static final int kFrontRightDrive = 4;
 
-        public static final int kBackLeftTurn = 5;
-        public static final int kBackLeftDrive = 6;
+        public static final int kBackRightTurn = 5;
+        public static final int kBackRightDrive = 6;
 
-        public static final int kBackRightTurn = 7;
-        public static final int kBackRightDrive = 8;
+        public static final int kBackLeftTurn = 7;
+        public static final int kBackLeftDrive = 8;
 
-        //CanCoder IDs
+        // CanCoder IDs
         public static final int kFrontLeftCANCoder = 9;
         public static final int kFrontRightCANCoder = 10;
-        public static final int kBackLeftCANCoder = 11;
-        public static final int kBackRightCANCoder = 12;
+        public static final int kBackRightCANCoder = 11;
+        public static final int kBackLeftCANCoder = 12;
 
-        //Pigeon
+        // Pigeon
         public static final int kGyro = 13;
     }
 
@@ -33,10 +33,10 @@ public class Constants {
     }
 
     public static class Offsets {
-        //THESE VALUES MUST BE BETWEEN -180 & 180 or -Pi & Pi
-        public static final double kFrontLeftOffset = Units.degreesToRadians(175.4);
-        public static final double kFrontRightOffset = Units.degreesToRadians(250.4-360);
-        public static final double kBackLeftOffset = Units.degreesToRadians(309.5-360);
-        public static final double kBackRightOffset = Units.degreesToRadians(340.1-360);
+        // Ensures that the offsets are between -Pi & Pi
+        public static final double kFrontLeftOffset = 3.1035;
+        public static final double kFrontRightOffset = -1.8959;
+        public static final double kBackLeftOffset = -0.8375;
+        public static final double kBackRightOffset = -0.3880;
     }
 }
