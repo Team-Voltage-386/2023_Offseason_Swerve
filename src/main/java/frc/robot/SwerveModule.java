@@ -4,10 +4,9 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
-import com.ctre.phoenix.sensors.CANCoderFaults;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -21,8 +20,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class SwerveModule {
     private static final double kWheelRadius = Units.inchesToMeters(2);
@@ -51,8 +48,8 @@ public class SwerveModule {
                     kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 
     // Gains are for example purposes only - must be determined for your own robot!
-    private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
-    private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
+//     private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
+//     private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
 
     public static final double kSwerveDriveEncConv = 0.000745;
 
@@ -71,17 +68,32 @@ public class SwerveModule {
             int driveMotorChannel,
             int turningMotorChannel,
             int turningEncoderID,
-            double encoderOffset) {
+            double encoderOffset,
+            boolean isReversed) {
         // The encoder: counts and measures rotation
-        // The moter: does the actual work, give it power
+        // The motor: does the actual work, give it power
 
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
-
-        m_driveMotor.getEncoder().setPositionConversionFactor(kSwerveDriveEncConv);
-        m_driveMotor.getEncoder().setVelocityConversionFactor(kSwerveDriveEncConv);
+        
+        // may need to turn PosConvFactor off (comment it out) when performing the alternative math calculation of wheel distance
+        //m_driveMotor.getEncoder().setPositionConversionFactor(kSwerveDriveEncConv);
+        //m_driveMotor.getEncoder().setVelocityConversionFactor(kSwerveDriveEncConv);
 
         m_turningEncoder = new CANCoder(turningEncoderID);
+        
+        // set units of the CANCoder to radians, with velocity being radians per second
+        CANCoderConfiguration config = new CANCoderConfiguration();
+        config.sensorCoefficient = 2 * Math.PI / kEncoderResolution;
+        config.unitString = "rad";
+        config.sensorTimeBase = SensorTimeBase.PerSecond;
+        m_turningEncoder.configAllSettings(config);
+        m_turningEncoder.clearStickyFaults();
+        m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+        m_turningEncoder.setPosition(0.0);
+        m_turningEncoder.configSensorDirection(isReversed); //false is default, may need to be true for some wheels
+        m_turningEncoder.configMagnetOffset(-0); //I dont know why its -0 but a big thread on delhpi was saying this was correct
+
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
@@ -90,27 +102,57 @@ public class SwerveModule {
         m_encoderOffset = encoderOffset;
     }
 
-    // /**
-    // * Returns the current state of the module.
-    // *
-    // * @return The current state of the module.
-    // */
-    // public SwerveModuleState getState() {
-    // return new SwerveModuleState(
-    // m_driveEncoder.getVelocity(), new
-    // Rotation2d(m_turningEncoder.getPosition()));
+    /**
+    * Returns the current state of the module.
+    *
+    * @return The current state of the module.
+    */
+    public SwerveModuleState getState() {
+    return new SwerveModuleState(
+    m_driveMotor.getEncoder().getVelocity(), new
+    Rotation2d(getActualTurningPosition()));
+    }
+
+    /**
+    * Returns the current position of the module.
+    *
+    * @return The current position of the module.
+    */
+    public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(
+      getActualDrivePosition(), 
+      new Rotation2d(getActualTurningPosition()));
+    }
+
+    /**
+     * Returns m_driveMotor.getEncoder().getPosition()
+     * gets real position the wheel thinks it has spun.
+     * the PositionConversionFactor (line 81) takes # of rotations and converts it to irl distance in meters.
+     * 
+     * @return distance wheel has gone across the floor. (Circumference*rotations)
+     */
+    // public double getActualDrivePosition() {
+    //   return m_driveMotor.getEncoder().getPosition();
     // }
 
-    // /**
-    // * Returns the current position of the module.
-    // *
-    // * @return The current position of the module.
-    // */
-    // public SwerveModulePosition getPosition() {
-    // return new SwerveModulePosition(
-    // m_driveEncoder., new Rotation2d(m_turningEncoder.getPosition()));
-    // }
+    // getActualDrivePosition with math instead of the drive conversion. should output same thing if conversion is tuned. disable PosConversion in constructor.
+    /**
+     * Returns rotations*2*Pi*R
+     * gets real position the wheel thinks it has spun.
+     * 
+     * @return distance wheel has gone across the floor. (Circumference*rotations)
+     */
+    public double getActualDrivePosition() {
+      return m_driveMotor.getEncoder().getPosition()*2*Math.PI*kWheelRadius;
+    }
 
+    //GET OFFSETS IN RADS
+    //MEASURING 0-2PI AND WHEN GOING PAST 2PI JUMPING BACK TO 0. WE NEED -180/180
+    /**
+     * Returns irl orientation of wheel, accounting for encoder offsets. 0 is when aligned with forward axis of the chasis.
+     * 
+     * @return real orientation of wheel.
+     */
     public double getActualTurningPosition() {
         return m_turningEncoder.getAbsolutePosition() - m_encoderOffset;
     }
@@ -129,14 +171,14 @@ public class SwerveModule {
         final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getEncoder().getVelocity(),
                 state.speedMetersPerSecond);
 
-        // final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
+        //final double driveFeedforward = m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
         // Calculate the turning motor output from the turning PID controller.
         final double turnOutput = m_turningPIDController.calculate(
                 getActualTurningPosition(),
                 state.angle.getRadians());
 
-        // final double turnFeedforward = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
+        //final double turnFeedforward = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
         m_driveMotor.setVoltage(driveOutput); // + driveFeedforward);
         m_turningMotor.setVoltage(turnOutput); // + turnFeedforward);
