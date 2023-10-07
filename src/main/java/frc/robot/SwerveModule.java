@@ -68,7 +68,8 @@ public class SwerveModule {
             int driveMotorChannel,
             int turningMotorChannel,
             int turningEncoderID,
-            double encoderOffset) {
+            double encoderOffset,
+            boolean isReversed) {
         // The encoder: counts and measures rotation
         // The motor: does the actual work, give it power
 
@@ -90,7 +91,7 @@ public class SwerveModule {
         m_turningEncoder.clearStickyFaults();
         m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         m_turningEncoder.setPosition(0.0);
-        m_turningEncoder.configSensorDirection(false); //making sure its default (false is default)
+        m_turningEncoder.configSensorDirection(isReversed); //false is default, may need to be true for some wheels
         m_turningEncoder.configMagnetOffset(-0); //I dont know why its -0 but a big thread on delhpi was saying this was correct
 
 

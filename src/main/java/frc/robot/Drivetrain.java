@@ -31,10 +31,10 @@ public class Drivetrain {
   //  private final SwerveModule m_backLeft = new SwerveModule(17, 13, 23, 68.05);
   //  private final SwerveModule m_backRight = new SwerveModule(16, 12, 22, 43.2);
 
-   private final SwerveModule m_frontLeft = new SwerveModule(18, 14, 24, 0.0);
-   private final SwerveModule m_frontRight = new SwerveModule(15, 11, 21, 0.0);
-   private final SwerveModule m_backLeft = new SwerveModule(17, 13, 23, 0.0);
-   private final SwerveModule m_backRight = new SwerveModule(16, 12, 22, 0.0);
+   private final SwerveModule m_frontLeft = new SwerveModule(18, 14, 24, 0.0, false);
+   private final SwerveModule m_frontRight = new SwerveModule(15, 11, 21, 0.0, false);
+   private final SwerveModule m_backLeft = new SwerveModule(17, 13, 23, 0.0, false);
+   private final SwerveModule m_backRight = new SwerveModule(16, 12, 22, 0.0, false);
 
   private final Pigeon2 m_gyro = new Pigeon2(2);
 
