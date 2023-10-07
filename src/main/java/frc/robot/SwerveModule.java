@@ -34,8 +34,8 @@ public class SwerveModule {
 
     private final CANCoder m_turningEncoder;
 
-    public static final double[] kSwerveSteerPID = { 0.006, 0.01, 0.0 }; // 0.01,0.0,0.001
-    public static final double[] kSwerveDrivePID = { 0.3, 2, 1 }; // 0.35,2,0.01
+    public static final double[] kSwerveSteerPID = { 0.005, 0, 0 }; // 0.01,0.0,0.001
+    public static final double[] kSwerveDrivePID = { 0, 0, 0 }; // 0.35,2,0.01
 
     // Gains are for example purposes only - must be determined for your own robot!
     private final PIDController m_drivePIDController = new PIDController(kSwerveDrivePID[0], kSwerveDrivePID[1],
@@ -50,8 +50,6 @@ public class SwerveModule {
     // Gains are for example purposes only - must be determined for your own robot!
 //     private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
 //     private final SimpleMotorFeedforward m_turnFeedforward = new SimpleMotorFeedforward(1, 0.5);
-
-    public static final double kSwerveDriveEncConv = 0.000745;
 
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder
@@ -75,10 +73,6 @@ public class SwerveModule {
 
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
-        
-        // may need to turn PosConvFactor off (comment it out) when performing the alternative math calculation of wheel distance
-        //m_driveMotor.getEncoder().setPositionConversionFactor(kSwerveDriveEncConv);
-        //m_driveMotor.getEncoder().setVelocityConversionFactor(kSwerveDriveEncConv);
 
         m_turningEncoder = new CANCoder(turningEncoderID);
         
@@ -123,17 +117,6 @@ public class SwerveModule {
       getActualDrivePosition(), 
       new Rotation2d(getActualTurningPosition()));
     }
-
-    /**
-     * Returns m_driveMotor.getEncoder().getPosition()
-     * gets real position the wheel thinks it has spun.
-     * the PositionConversionFactor (line 81) takes # of rotations and converts it to irl distance in meters.
-     * 
-     * @return distance wheel has gone across the floor. (Circumference*rotations)
-     */
-    // public double getActualDrivePosition() {
-    //   return m_driveMotor.getEncoder().getPosition();
-    // }
 
     // getActualDrivePosition with math instead of the drive conversion. should output same thing if conversion is tuned. disable PosConversion in constructor.
     /**

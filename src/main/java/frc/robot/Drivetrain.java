@@ -15,6 +15,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.ID;
+import frc.robot.Constants.Offsets;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
@@ -26,17 +28,12 @@ public class Drivetrain {
    private final Translation2d m_backLeftLocation = new Translation2d(-0.365125, -0.263525);
    private final Translation2d m_backRightLocation = new Translation2d(-0.365125, 0.263525);
 
-  //  private final SwerveModule m_frontLeft = new SwerveModule(18, 14, 24, 84.03);
-  //  private final SwerveModule m_frontRight = new SwerveModule(15, 11, 21, 210.05);
-  //  private final SwerveModule m_backLeft = new SwerveModule(17, 13, 23, 68.05);
-  //  private final SwerveModule m_backRight = new SwerveModule(16, 12, 22, 43.2);
+   private final SwerveModule m_frontLeft = new SwerveModule(ID.kFrontLeftDrive, ID.kFrontLeftTurn, ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset, false);
+   private final SwerveModule m_frontRight = new SwerveModule(ID.kFrontRightDrive, ID.kFrontLeftTurn, ID.kFrontRightCANCoder, Offsets.kFrontRightOffset, false);
+   private final SwerveModule m_backLeft = new SwerveModule(ID.kBackLeftDrive, ID.kBackLeftTurn, ID.kBackLeftCANCoder, Offsets.kBackLeftOffset, false);
+   private final SwerveModule m_backRight = new SwerveModule(ID.kBackRightDrive, ID.kBackRightTurn, ID.kBackRightCANCoder, Offsets.kBackRightOffset, false);
 
-   private final SwerveModule m_frontLeft = new SwerveModule(18, 14, 24, 0.0, false);
-   private final SwerveModule m_frontRight = new SwerveModule(15, 11, 21, 0.0, false);
-   private final SwerveModule m_backLeft = new SwerveModule(17, 13, 23, 0.0, false);
-   private final SwerveModule m_backRight = new SwerveModule(16, 12, 22, 0.0, false);
-
-  private final Pigeon2 m_gyro = new Pigeon2(2);
+  private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
 
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(
@@ -76,7 +73,6 @@ public class Drivetrain {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    //System.out.printf("Gyro yaw: %f\n", m_gyro.getYaw());
     SmartDashboard.putNumber("Deg Gyro angle", getGyroYawRotation2d().getDegrees());
     SmartDashboard.putNumber("Rad Gyro angle", getGyroYawRotation2d().getRadians());
 
@@ -87,10 +83,6 @@ public class Drivetrain {
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
-
-    // for (int i = 0; i < swerveModuleStates.length; i++) {
-    //     System.out.printf("State %d: %s\n", i, swerveModuleStates[i].toString());
-    // }
 
     //putting angles of swerve modules on dashboard for debbie's advantage scope and debugging.
     SmartDashboard.putNumber("LF", m_frontLeft.getActualTurningPosition());
