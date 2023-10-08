@@ -41,7 +41,7 @@ public class Constants {
     };
 
     public static class Controller {
-        public static final int kDriveController = 1;
+        public static final int kDriveController = 0;
 
         /**
          * Rate limiters make joystick inputs more gentle; 1/3 sec from 0 to 1.
@@ -57,9 +57,9 @@ public class Constants {
         /**
          * Encoder offsets
          */
-        public static final double kFrontLeftOffset = 3.1035;
-        public static final double kFrontRightOffset = -1.8959;
-        public static final double kBackLeftOffset = -0.8375;
-        public static final double kBackRightOffset = -0.3880;
+        public static final double kFrontLeftOffset = 3.1032;
+        public static final double kFrontRightOffset = -1.8945;
+        public static final double kBackLeftOffset = -0.8606;
+        public static final double kBackRightOffset = -0.3053;
     }
 }

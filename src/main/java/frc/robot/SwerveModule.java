@@ -62,7 +62,7 @@ public class SwerveModule {
      */
     private final String m_swerveModuleName;
 
-    public static final double[] kSwerveSteerPID = { 2.0, 0, 0 };
+    public static final double[] kSwerveSteerPID = { 6.0, 0, 0 };
     public static final double[] kSwerveDrivePID = { 0, 0, 0 };
 
     private final PIDController m_drivePIDController = new PIDController(kSwerveDrivePID[0], kSwerveDrivePID[1],
@@ -201,6 +201,11 @@ public class SwerveModule {
         // but is left in case you want to try using it
         // final double driveFeedforward =
         // m_driveFeedforward.calculate(state.speedMetersPerSecond);
+
+        SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
+        SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position", state.angle.getRadians());
+        SmartDashboard.putNumber(m_swerveModuleName + " Diff Turning Position",
+                getActualTurningPosition() - state.angle.getRadians());
 
         // Calculate the turning motor output from the turning PID controller.
         final double turnOutput = m_turningPIDController.calculate(
