@@ -36,8 +36,8 @@ public class Constants {
 
         public static final int kXForward = 1;
         public static final int kXBackward = -1;
-        public static final int kYLeft = -1;
-        public static final int kYRight = 1;
+        public static final int kYLeft = 1;
+        public static final int kYRight = -1;
     };
 
     public static class Controller {
@@ -46,9 +46,9 @@ public class Constants {
         /**
          * Rate limiters make joystick inputs more gentle; 1/3 sec from 0 to 1.
          */
-        public static final double kRateLimitXSpeed = 3.0;
-        public static final double kRateLimitYSpeed = 3.0;
-        public static final double kRateLimitRot = 3.0;
+        public static final double kRateLimitXSpeed = 100.0;
+        public static final double kRateLimitYSpeed = 100.0;
+        public static final double kRateLimitRot = 100.0;
     }
 
     public static class Offsets {

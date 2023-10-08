@@ -6,12 +6,16 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.Deadbands;
 import frc.robot.Constants.Controller;;
 
 public class Robot extends TimedRobot {
+    private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 0, 1);
+
     private final XboxController m_controller = new XboxController(Controller.kDriveController);
     private final Drivetrain m_swerve = new Drivetrain();
 
@@ -61,5 +65,9 @@ public class Robot extends TimedRobot {
                 * Drivetrain.kMaxAngularSpeed;
 
         m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+
+        if (m_controller.getRightBumperPressed()) {
+            m_swerve.resetGyro();
+        }
     }
 }

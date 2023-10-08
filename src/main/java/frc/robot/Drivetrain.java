@@ -20,7 +20,7 @@ import frc.robot.Constants.DriveTrain;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-    public static final double kMaxSpeed = 0.1; // meters per second (could be 3 (was for other robot) when not testing)
+    public static final double kMaxSpeed = 2.0; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
     private final Translation2d m_frontLeftLocation = new Translation2d(
@@ -71,6 +71,11 @@ public class Drivetrain {
         // Zero at beginning of match to know what way is forward
         // NOTE: This requires that the robot starts forward
         m_gyro.zeroGyroBiasNow();
+        this.resetGyro();
+    }
+
+    public void resetGyro() {
+        m_gyro.setYaw(0);
     }
 
     /**

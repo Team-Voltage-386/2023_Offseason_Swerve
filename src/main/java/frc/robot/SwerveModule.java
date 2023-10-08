@@ -58,13 +58,15 @@ public class SwerveModule {
      */
     private final CANCoder m_turningEncoder;
 
+    private static final double kEncoderConversionMetersPerRotation = 0.000745;
+
     /**
      * Identification for what motor this is
      */
     private final String m_swerveModuleName;
 
-    public static final double[] kSwerveSteerPID = { 6.0, 0, 0 };
-    public static final double[] kSwerveDrivePID = { 0, 0, 0 };
+    public static final double[] kSwerveSteerPID = { 1.0, 1.0, 0.0 };
+    public static final double[] kSwerveDrivePID = { 0.1, 0.5, 0.008 };
 
     private final PIDController m_drivePIDController = new PIDController(kSwerveDrivePID[0], kSwerveDrivePID[1],
             kSwerveDrivePID[2]);
@@ -106,6 +108,8 @@ public class SwerveModule {
          * Set up the drive motor
          */
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
+        m_driveMotor.getEncoder().setPositionConversionFactor(kEncoderConversionMetersPerRotation);
+        m_driveMotor.getEncoder().setVelocityConversionFactor(kEncoderConversionMetersPerRotation);
 
         /*
          * Set up the turning motor. We had to invert the turning motor so it agreed
@@ -183,6 +187,10 @@ public class SwerveModule {
         return m_turningEncoder.getAbsolutePosition() - m_encoderOffset;
     }
 
+    public void resetDriveError() {
+        m_drivePIDController.reset();
+    }
+
     /**
      * Sets the desired state for the module.
      *
@@ -194,6 +202,10 @@ public class SwerveModule {
         SwerveModuleState state = SwerveModuleState.optimize(desiredState,
                 new Rotation2d(getActualTurningPosition()));
 
+        if (state.speedMetersPerSecond < 0.05) {
+            this.resetDriveError();
+        }
+
         // Calculate the drive output from the drive PID controller.
         final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getEncoder().getVelocity(),
                 state.speedMetersPerSecond);
@@ -204,7 +216,7 @@ public class SwerveModule {
                 state.angle.getRadians());
 
         // Left in from the example code we adapted, this is not required for actual use
-        //but is left in case you want to try using it
+        // but is left in case you want to try using it
         // final double driveFeedforward =
         // m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
@@ -213,13 +225,16 @@ public class SwerveModule {
         // final double turnFeedforward =
         // m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
-        m_driveMotor.setVoltage(driveOutput); // + driveFeedforward);
-        m_turningMotor.setVoltage(turnOutput); // + turnFeedforward);
+        m_driveMotor.set(driveOutput); // + driveFeedforward);
+        m_turningMotor.set(turnOutput); // + turnFeedforward);
 
         SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
         SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position", state.angle.getRadians());
         SmartDashboard.putNumber(m_swerveModuleName + " Diff Turning Position",
                 getActualTurningPosition() - state.angle.getRadians());
+        SmartDashboard.putNumber(m_swerveModuleName + " Drive Output", driveOutput);
+        SmartDashboard.putNumber(m_swerveModuleName + " Turning Output", turnOutput);
+        SmartDashboard.putNumber(m_swerveModuleName + " Drive Velocity", m_driveMotor.getEncoder().getVelocity());
     }
 
     /**
