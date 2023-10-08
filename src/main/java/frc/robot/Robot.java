@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import Subsytems.Pneumatics;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -14,6 +15,7 @@ import frc.robot.Constants.Deadbands;
 public class Robot extends TimedRobot {
     private final XboxController m_controller = new XboxController(0);
     private final Drivetrain m_swerve = new Drivetrain();
+    private final Pneumatics m_Pneumatics = new Pneumatics();
 
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
