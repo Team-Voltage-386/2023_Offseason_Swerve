@@ -9,6 +9,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -197,20 +198,15 @@ public class SwerveModule {
         final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getEncoder().getVelocity(),
                 state.speedMetersPerSecond);
 
-        // Left in from the example code we adapted, this is not required for actual use
-        // but is left in case you want to try using it
-        // final double driveFeedforward =
-        // m_driveFeedforward.calculate(state.speedMetersPerSecond);
-
-        SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
-        SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position", state.angle.getRadians());
-        SmartDashboard.putNumber(m_swerveModuleName + " Diff Turning Position",
-                getActualTurningPosition() - state.angle.getRadians());
-
         // Calculate the turning motor output from the turning PID controller.
         final double turnOutput = m_turningPIDController.calculate(
                 getActualTurningPosition(),
                 state.angle.getRadians());
+
+        // Left in from the example code we adapted, this is not required for actual use
+        //but is left in case you want to try using it
+        // final double driveFeedforward =
+        // m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
         // Left in from the example code we adapted, this is not required for actual use
         // but is left in case you want to try using it
@@ -219,6 +215,11 @@ public class SwerveModule {
 
         m_driveMotor.setVoltage(driveOutput); // + driveFeedforward);
         m_turningMotor.setVoltage(turnOutput); // + turnFeedforward);
+
+        SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
+        SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position", state.angle.getRadians());
+        SmartDashboard.putNumber(m_swerveModuleName + " Diff Turning Position",
+                getActualTurningPosition() - state.angle.getRadians());
     }
 
     /**
