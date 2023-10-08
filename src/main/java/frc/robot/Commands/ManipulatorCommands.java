@@ -5,11 +5,7 @@
 package frc.robot.Commands;
 
 import Subsytems.Pneumatics;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ControllerConstants;
 
 public class ManipulatorCommands extends CommandBase {
   private Pneumatics PneumaticSystem;
