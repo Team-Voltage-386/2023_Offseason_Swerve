@@ -13,6 +13,7 @@ import frc.robot.Constants.ControllerConstants;
 
 public class ManipulatorCommands extends CommandBase {
   private Pneumatics PneumaticSystem;
+  private boolean isInConeMode = false;
 
   /** Creates a new ManipulatorCommands. */
   public ManipulatorCommands(Pneumatics pneumatics) {
@@ -30,14 +31,7 @@ public class ManipulatorCommands extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kRightBumper)) 
-    {
-      
-    }
-    else
-    {
-      
-    }
+    //Does not work, will figure out why later
   }
 
   // Called once the command ends or is interrupted.

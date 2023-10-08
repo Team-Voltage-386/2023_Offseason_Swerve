@@ -44,7 +44,7 @@ public class Constants {
     /** the indexes to address buttons on the controller */
     public static final class ControllerConstants {
         public static final double kDeadband = .1;
-        public static final Joystick kDriver = new Joystick(0);
+        //public static final Joystick kDriver = new Joystick(0);
         public static final Joystick kManipulator = new Joystick(1);
 
         public static final int kLeftVertical = 1;

@@ -7,16 +7,24 @@ package frc.robot;
 import Subsytems.Pneumatics;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Commands.ManipulatorCommands;
 import frc.robot.Constants.Deadbands;
 
 public class Robot extends TimedRobot {
     private final XboxController m_controller = new XboxController(0);
-    private final Drivetrain m_swerve = new Drivetrain();
-    private final Pneumatics m_Pneumatics = new Pneumatics();
-
+    //private final Drivetrain m_swerve = new Drivetrain();
+    private Pneumatics m_Pneumatics = new Pneumatics();
+    private final ManipulatorCommands m_manipulatorCommand = new ManipulatorCommands(m_Pneumatics);
+    
+    @Override
+    public void teleopInit() {
+        
+    }
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
@@ -31,11 +39,12 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         driveWithJoystick(true);
+        m_Pneumatics.controls(); 
     }
 
     @Override
     public void disabledPeriodic() {
-        m_swerve.print();
+        //m_swerve.print();
     }
 
     private void driveWithJoystick(boolean fieldRelative) {
@@ -64,6 +73,6 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("YSpeed", ySpeed);
         // SmartDashboard.putNumber("Rot", rot);
 
-        m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+        //m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
     }
 }
