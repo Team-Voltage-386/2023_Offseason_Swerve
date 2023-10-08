@@ -1,7 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.util.Units;
-
 public class Constants {
     public static class ID {
         // Swerve motor controller IDs
@@ -32,8 +30,33 @@ public class Constants {
         public static final double kRightJoyStickDeadband = 0.3;
     }
 
+    public static class DriveTrain {
+        public static final double kDistanceMiddleToFrontMotor = 0.365125;
+        public static final double kDistanceMiddleToSideMotor = 0.263525;
+
+        public static final int kXForward = 1;
+        public static final int kXBackward = -1;
+        public static final int kYLeft = -1;
+        public static final int kYRight = 1;
+    };
+
+    public static class Controller {
+        public static final int kDriveController = 1;
+
+        /**
+         * Rate limiters make joystick inputs more gentle; 1/3 sec from 0 to 1.
+         */
+        public static final double kRateLimitXSpeed = 3.0;
+        public static final double kRateLimitYSpeed = 3.0;
+        public static final double kRateLimitRot = 3.0;
+    }
+
     public static class Offsets {
-        // Ensures that the offsets are between -Pi & Pi
+        // Ensure that the encoder offsets are between -Pi & Pi
+
+        /**
+         * Encoder offsets
+         */
         public static final double kFrontLeftOffset = 3.1035;
         public static final double kFrontRightOffset = -1.8959;
         public static final double kBackLeftOffset = -0.8375;

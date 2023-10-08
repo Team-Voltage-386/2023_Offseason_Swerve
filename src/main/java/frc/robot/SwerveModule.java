@@ -13,13 +13,11 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
@@ -29,28 +27,55 @@ public class SwerveModule {
     private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularSpeed;
     private static final double kModuleMaxAngularAcceleration = 2 * Math.PI; // radians per second squared
 
+    /**
+     * The drive motor is responsible for the actual power across the ground e.g. to
+     * make it move forward/backward
+     */
     private final CANSparkMax m_driveMotor;
+
+    /**
+     * The turning/steering motor is responsible for the orientation of the wheel
+     * e.g. to make it turn
+     */
     private final CANSparkMax m_turningMotor;
+
+    /**
+     * Each turning motor has an encoder. Each motor was mounted by people at
+     * seemingly random offsets. We have to accomadate for these
+     * offsets so that calls to getAbsolutePosition all return the same value
+     * regardless of motor i.e. make them consider the same reference point as "0"
+     */
     public final double m_encoderOffset;
 
+    /**
+     * This does not control the motor. This just records the orientatation of the
+     * module.
+     * IMPORTANT NOTE: Ensure that the encoder and motor both agree which
+     * direction is positive.
+     * We faced an issue where the motor oscillated inexplicably and we traced it
+     * back to the motor needing to be inverted to match with the encoder.
+     */
     private final CANCoder m_turningEncoder;
 
-    private final String m_swerveModuleID;
+    /**
+     * Identification for what motor this is
+     */
+    private final String m_swerveModuleName;
 
-    public static final double[] kSwerveSteerPID = { 2.0, 0, 0 }; // 0.01,0.0,0.001
-    public static final double[] kSwerveDrivePID = { 0, 0, 0 }; // 0.35,2,0.01
+    public static final double[] kSwerveSteerPID = { 2.0, 0, 0 };
+    public static final double[] kSwerveDrivePID = { 0, 0, 0 };
 
-    // Gains are for example purposes only - must be determined for your own robot!
     private final PIDController m_drivePIDController = new PIDController(kSwerveDrivePID[0], kSwerveDrivePID[1],
             kSwerveDrivePID[2]);
 
-    // Gains are for example purposes only - must be determined for your own robot!
     private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
             kSwerveSteerPID[0], kSwerveSteerPID[1], kSwerveSteerPID[2],
             new TrapezoidProfile.Constraints(
                     kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 
-    // Gains are for example purposes only - must be determined for your own robot!
+    // Example code came with these feed forward pieces which we haven't yet added
+    // as they are meant for tuning and are not required
+    // We leave them here in case you'd like to reference them
     // private final SimpleMotorFeedforward m_driveFeedforward = new
     // SimpleMotorFeedforward(1, 3);
     // private final SimpleMotorFeedforward m_turnFeedforward = new
@@ -72,18 +97,29 @@ public class SwerveModule {
             int driveMotorChannel,
             int turningMotorChannel,
             int turningEncoderID,
-            double encoderOffset,
-            boolean isReversed) {
-        // The encoder: counts and measures rotation
-        // The motor: does the actual work, give it power
+            double encoderOffset) {
 
+        m_swerveModuleName = swerveModuleID;
+
+        /*
+         * Set up the drive motor
+         */
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
+
+        /*
+         * Set up the turning motor. We had to invert the turning motor so it agreed
+         * with the turning encoder which direction was positive
+         */
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
         m_turningMotor.setInverted(true);
 
+        /*
+         * Set up and configure the turning encoder. Additional config is required to
+         * ensure that units are correct
+         */
         m_turningEncoder = new CANCoder(turningEncoderID);
 
-        // set units of the CANCoder to radians, with velocity being radians per second
+        // Set units of the CANCoder to radians, with velocity being radians per second
         CANCoderConfiguration config = new CANCoderConfiguration();
         config.sensorCoefficient = 2 * Math.PI / kEncoderResolution;
         config.unitString = "rad";
@@ -91,22 +127,18 @@ public class SwerveModule {
         m_turningEncoder.configAllSettings(config);
         m_turningEncoder.clearStickyFaults();
         m_turningEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
-        m_turningEncoder.configSensorDirection(isReversed); // false is default, may need to be true for some wheels
-        // m_turningEncoder.configMagnetOffset(-0); // I dont know why its -0 but a big
-        // thread on delhpi was saying this
-        // // was correct
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
         m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         m_encoderOffset = encoderOffset;
-
-        m_swerveModuleID = swerveModuleID;
     }
 
     /**
-     * Returns the current state of the module.
+     * Returns the current Swerve Module state. This includes info about the module
+     * wheel's speed per second and the angle of the module. Units are based on the
+     * configuration of the motors and encoders
      *
      * @return The current state of the module.
      */
@@ -116,7 +148,8 @@ public class SwerveModule {
     }
 
     /**
-     * Returns the current position of the module.
+     * Returns the current position of the module. This includes info about the
+     * distance measured by the wheel and the angle of the module.
      *
      * @return The current position of the module.
      */
@@ -130,8 +163,8 @@ public class SwerveModule {
     // output same thing if conversion is tuned. disable PosConversion in
     // constructor.
     /**
-     * Returns rotations*2*Pi*R
-     * gets real position the wheel thinks it has spun.
+     * Returns the distance the wheel thinks it has gone across the floor. We use
+     * math here instead of built-in drive conversion for ease of use
      * 
      * @return distance wheel has gone across the floor. (Circumference*rotations)
      */
@@ -139,10 +172,8 @@ public class SwerveModule {
         return m_driveMotor.getEncoder().getPosition() * 2 * Math.PI * kWheelRadius;
     }
 
-    // GET OFFSETS IN RADS
-    // MEASURING 0-2PI AND WHEN GOING PAST 2PI JUMPING BACK TO 0. WE NEED -180/180
     /**
-     * Returns irl orientation of wheel, accounting for encoder offsets. 0 is when
+     * Returns orientation of wheel, accounting for encoder offsets. 0 is when
      * aligned with forward axis of the chasis.
      * 
      * @return real orientation of wheel.
@@ -157,51 +188,27 @@ public class SwerveModule {
      * @param desiredState Desired state with speed and angle.
      */
     public void setDesiredState(SwerveModuleState desiredState) {
-        // Optimize the reference state to avoid spinning further than 90 degrees
+        // Optimize the reference state to avoid spinning further than 90 degrees or
+        // PI/2 radians
         SwerveModuleState state = SwerveModuleState.optimize(desiredState,
                 new Rotation2d(getActualTurningPosition()));
-
-        // SwerveModuleState state = desiredState;
-
-        // SmartDashboard.putNumber(m_swerveModuleID + " DesiredState Angle",
-        // desiredState.angle.getDegrees());
-        // SmartDashboard.putNumber(m_swerveModuleID + " Current Angle",
-        // new Rotation2d(getActualTurningPosition()).getDegrees());
-        // SmartDashboard.putNumber(m_swerveModuleID + " Delta Angle",
-        // desiredState.angle.minus(new
-        // Rotation2d(getActualTurningPosition())).getDegrees());
-
-        // SmartDashboard.putNumber(m_swerveModuleID + " Drive Velocity",
-        // m_driveMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber(m_swerveModuleID + " Turn Position",
-        // getActualTurningPosition());
-        // SmartDashboard.putNumber(m_swerveModuleID + " Goal Speed",
-        // state.speedMetersPerSecond);
-        // SmartDashboard.putNumber(m_swerveModuleID + " Goal Angle",
-        // state.angle.getRadians());
 
         // Calculate the drive output from the drive PID controller.
         final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getEncoder().getVelocity(),
                 state.speedMetersPerSecond);
 
+        // Left in from the example code we adapted, this is not required for actual use
+        // but is left in case you want to try using it
         // final double driveFeedforward =
         // m_driveFeedforward.calculate(state.speedMetersPerSecond);
-
-        // SmartDashboard.putNumber(m_swerveModuleID + " Angle Measurement",
-        // m_turningEncoder.getAbsolutePosition());
-        // SmartDashboard.putNumber(m_swerveModuleID + " Angle With Offset",
-        // getActualTurningPosition());
-        // SmartDashboard.putNumber(m_swerveModuleID + " Angle Target",
-        // state.angle.getRadians());
-
-        // SmartDashboard.putNumber(m_swerveModuleID + " Angle Diff",
-        // getActualTurningPosition() - state.angle.getRadians());
 
         // Calculate the turning motor output from the turning PID controller.
         final double turnOutput = m_turningPIDController.calculate(
                 getActualTurningPosition(),
                 state.angle.getRadians());
 
+        // Left in from the example code we adapted, this is not required for actual use
+        // but is left in case you want to try using it
         // final double turnFeedforward =
         // m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
@@ -209,7 +216,10 @@ public class SwerveModule {
         m_turningMotor.setVoltage(turnOutput); // + turnFeedforward);
     }
 
+    /**
+     * Put info on smart dashboard
+     */
     public void print() {
-        SmartDashboard.putNumber(m_swerveModuleID + " Absolute Position", m_turningEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber(m_swerveModuleName + " Absolute Position", m_turningEncoder.getAbsolutePosition());
     }
 }

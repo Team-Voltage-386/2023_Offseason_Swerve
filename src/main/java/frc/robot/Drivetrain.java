@@ -14,32 +14,46 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ID;
 import frc.robot.Constants.Offsets;
+import frc.robot.Constants.DriveTrain;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-    public static final double kMaxSpeed = 0.1; // meters per second (should be 3 when not testing)
+    public static final double kMaxSpeed = 0.1; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-    private final Translation2d m_frontLeftLocation = new Translation2d(0.365125, -0.263525);
-    private final Translation2d m_frontRightLocation = new Translation2d(0.365125, 0.263525);
-    private final Translation2d m_backLeftLocation = new Translation2d(-0.365125, -0.263525);
-    private final Translation2d m_backRightLocation = new Translation2d(-0.365125, 0.263525);
+    private final Translation2d m_frontLeftLocation = new Translation2d(
+            DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXForward,
+            DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYLeft);
+    private final Translation2d m_frontRightLocation = new Translation2d(
+            DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXForward,
+            DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYRight);
+    private final Translation2d m_backLeftLocation = new Translation2d(
+            DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXBackward,
+            DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYLeft);
+    private final Translation2d m_backRightLocation = new Translation2d(
+            DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXBackward,
+            DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYRight);
 
     private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
-            ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset, false);
+            ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset);
     private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
-            ID.kFrontRightCANCoder, Offsets.kFrontRightOffset, false);
+            ID.kFrontRightCANCoder, Offsets.kFrontRightOffset);
     private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
             ID.kBackLeftCANCoder,
-            Offsets.kBackLeftOffset, false);
+            Offsets.kBackLeftOffset);
     private final SwerveModule m_backRight = new SwerveModule("BackRight", ID.kBackRightDrive, ID.kBackRightTurn,
-            ID.kBackRightCANCoder, Offsets.kBackRightOffset, false);
+            ID.kBackRightCANCoder, Offsets.kBackRightOffset);
 
     private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
 
+    /**
+     * The order that you initialize these is important! Later uses of functions
+     * like toSwerveModuleStates will return the same order that these are provided.
+     * See
+     * https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html
+     */
     private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
             m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
@@ -54,10 +68,14 @@ public class Drivetrain {
             });
 
     public Drivetrain() {
-        // m_gyro.reset();
+        // Zero at beginning of match to know what way is forward
+        // NOTE: This requires that the robot starts forward
         m_gyro.zeroGyroBiasNow();
     }
 
+    /**
+     * Sends swerve info to smart dashboard
+     */
     public void print() {
         m_frontLeft.print();
         m_frontRight.print();
@@ -66,7 +84,7 @@ public class Drivetrain {
     }
 
     /**
-     * returns yaw of gyro in Rotation2d form
+     * Get the yaw of gyro in Rotation2d form
      * 
      * @return chasis angle in Rotation2d
      */
@@ -84,11 +102,6 @@ public class Drivetrain {
      *                      field.
      */
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        // SmartDashboard.putNumber("Deg Gyro angle",
-        // getGyroYawRotation2d().getDegrees());
-        // SmartDashboard.putNumber("Rad Gyro angle",
-        // getGyroYawRotation2d().getRadians());
-
         SwerveModuleState[] swerveModuleStates = m_kinematics.toSwerveModuleStates(
                 fieldRelative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getGyroYawRotation2d())
