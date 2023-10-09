@@ -5,7 +5,11 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -14,9 +18,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.ID;
 import frc.robot.Constants.Offsets;
 import frc.robot.Constants.DriveTrain;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
@@ -60,12 +67,9 @@ public class Drivetrain {
     private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
             m_kinematics,
             getGyroYawRotation2d(),
-            new SwerveModulePosition[] {
-                    m_frontLeft.getPosition(),
-                    m_frontRight.getPosition(),
-                    m_backLeft.getPosition(),
-                    m_backRight.getPosition()
-            });
+            getModulePositions());
+
+    ChassisSpeeds m_chassisSpeeds = m_kinematics.toChassisSpeeds(getModuleStates());
 
     public Drivetrain() {
         // Zero at beginning of match to know what way is forward
@@ -114,17 +118,81 @@ public class Drivetrain {
         m_frontRight.setDesiredState(swerveModuleStates[1]);
         m_backLeft.setDesiredState(swerveModuleStates[2]);
         m_backRight.setDesiredState(swerveModuleStates[3]);
+        updateChassispeeds();
     }
 
-    /** Updates the field relative position of the robot. */
+        // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
+        // https://github.com/HighlanderRobotics/Rapid-React/blob/main/src/main/java/frc/robot/subsystems/DrivetrainSubsystem.java
+        public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+                return new SequentialCommandGroup(
+                        new InstantCommand(() -> {
+                        // Reset odometry for the first path you run during auto
+                        if(isFirstPath){
+                                this.resetOdometry(traj.getInitialHolonomicPose());
+                        }
+                        }),
+                        new PPSwerveControllerCommand(
+                                traj, 
+                                () -> m_odometry.getPoseMeters(), // Pose supplier
+                                this.m_kinematics, // SwerveDriveKinematics
+                                new PIDController(0.5, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                                new PIDController(0.5, 0, 0), // Y controller (usually the same values as X controller)
+                                new PIDController(0.5, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                                (SwerveModuleState[] states) -> { // Consumes the module states to set the modules moving in the directions we want
+                                        m_chassisSpeeds = m_kinematics.toChassisSpeeds(states);
+                                        setModuleStates(states);
+                                }, // Module states consumer
+                                true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+                                this // Requires this drive subsystem
+                        )
+                );
+        }
+
+        public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
+                m_frontLeft.setDesiredState(swerveModuleStates[0]);
+                m_frontRight.setDesiredState(swerveModuleStates[1]);
+                m_backLeft.setDesiredState(swerveModuleStates[2]);
+                m_backRight.setDesiredState(swerveModuleStates[3]);
+        }
+
+        public SwerveModuleState[] getModuleStates() {
+                return new SwerveModuleState[] {
+                        m_frontLeft.getState(),
+                        m_frontRight.getState(),
+                        m_backLeft.getState(),
+                        m_backRight.getState()
+                };
+        }
+
+        public void updateChassispeeds() {
+                m_chassisSpeeds = m_kinematics.toChassisSpeeds(getModuleStates());
+        }
+
+    /**
+     * resets odometry using the current rotation, the current module positions, and a Pose2d
+     * @param initialHolonomicPose
+     */
+    public void resetOdometry(Pose2d initialHolonomicPose) {
+        m_odometry.resetPosition(getGyroYawRotation2d(), getModulePositions(), initialHolonomicPose);
+    }
+
+    /**
+     * returns swerve module positions
+     * @return
+     */
+    public SwerveModulePosition[] getModulePositions() {
+        return new SwerveModulePosition[] {
+                m_frontLeft.getPosition(),
+                m_frontRight.getPosition(),
+                m_backLeft.getPosition(),
+                m_backRight.getPosition()
+        };
+    }
+
+/** Updates the field relative position of the robot. */
     public void updateOdometry() {
         m_odometry.update(
                 getGyroYawRotation2d(),
-                new SwerveModulePosition[] {
-                        m_frontLeft.getPosition(),
-                        m_frontRight.getPosition(),
-                        m_backLeft.getPosition(),
-                        m_backRight.getPosition()
-                });
+                getModulePositions());
     }
 }
