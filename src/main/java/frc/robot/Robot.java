@@ -14,7 +14,8 @@ import frc.robot.Constants.Deadbands;
 import frc.robot.Constants.Controller;;
 
 public class Robot extends TimedRobot {
-    private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 0, 1);
+    // private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(0,
+    // PneumaticsModuleType.CTREPCM, 0, 1);
 
     private final XboxController m_controller = new XboxController(Controller.kDriveController);
     private final Drivetrain m_swerve = new Drivetrain();

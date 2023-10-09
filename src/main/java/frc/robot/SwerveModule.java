@@ -65,16 +65,9 @@ public class SwerveModule {
      */
     private final String m_swerveModuleName;
 
-    public static final double[] kSwerveSteerPID = { 1.0, 1.0, 0.0 };
-    public static final double[] kSwerveDrivePID = { 0.1, 0.5, 0.008 };
+    private final PIDController m_drivePIDController;
 
-    private final PIDController m_drivePIDController = new PIDController(kSwerveDrivePID[0], kSwerveDrivePID[1],
-            kSwerveDrivePID[2]);
-
-    private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
-            kSwerveSteerPID[0], kSwerveSteerPID[1], kSwerveSteerPID[2],
-            new TrapezoidProfile.Constraints(
-                    kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
+    private final ProfiledPIDController m_turningPIDController;
 
     // Example code came with these feed forward pieces which we haven't yet added
     // as they are meant for tuning and are not required
@@ -100,7 +93,21 @@ public class SwerveModule {
             int driveMotorChannel,
             int turningMotorChannel,
             int turningEncoderID,
-            double encoderOffset) {
+            double encoderOffset,
+            double[] steerPID,
+            double[] drivePID) {
+
+        m_drivePIDController = new PIDController(
+                drivePID[0],
+                drivePID[1],
+                drivePID[2]);
+
+        m_turningPIDController = new ProfiledPIDController(
+                steerPID[0],
+                steerPID[1],
+                steerPID[2],
+                new TrapezoidProfile.Constraints(
+                        kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 
         m_swerveModuleName = swerveModuleID;
 
@@ -211,9 +218,19 @@ public class SwerveModule {
                 state.speedMetersPerSecond);
 
         // Calculate the turning motor output from the turning PID controller.
-        final double turnOutput = m_turningPIDController.calculate(
+        double turnOutput = m_turningPIDController.calculate(
                 getActualTurningPosition(),
                 state.angle.getRadians());
+
+        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output Before Mod", turnOutput);
+        // Limit turn output between -1 and 1 for turning motor
+        // if (turnOutput < -1) {
+        //     turnOutput = -1.0;
+        // }
+        // if (turnOutput > 1) {
+        //     turnOutput = 1.0;
+        // }
+        //SmartDashboard.putNumber(m_swerveModuleName + " Turning Output After Mod", turnOutput);
 
         // Left in from the example code we adapted, this is not required for actual use
         // but is left in case you want to try using it
@@ -242,5 +259,7 @@ public class SwerveModule {
      */
     public void print() {
         SmartDashboard.putNumber(m_swerveModuleName + " Absolute Position", m_turningEncoder.getAbsolutePosition());
+
+        SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
     }
 }
