@@ -24,9 +24,10 @@ import frc.robot.Constants.ID;
 import frc.robot.Constants.Offsets;
 import frc.robot.Constants.DriveTrain;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Represents a swerve drive style drivetrain. */
-public class Drivetrain {
+public class Drivetrain extends SubsystemBase {
     public static final double kMaxSpeed = 0.1; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
