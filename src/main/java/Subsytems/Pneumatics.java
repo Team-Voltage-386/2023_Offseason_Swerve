@@ -9,37 +9,34 @@ public class Pneumatics {
     private DoubleSolenoid Lift;
     private DoubleSolenoid Cube;
     private DoubleSolenoid Cone;
-    private boolean isInConeMode = false;
+    private boolean ConeClose=false;
+    private boolean CubeClose=false;
 
     public void controls()
     {
-        if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kLeftOptions)) 
-        {
-            isInConeMode = false;
-        }
-        if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kRightOptions)) 
-        {
-            isInConeMode = true;
-        }
         if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kY))
         {
-            if (isInConeMode)
+            if (ConeClose)
             {
+                ConeClose = false;
                 enableCone();
             }
             else
             {
-                enableCube();
+                ConeClose = true;
+                disableCone();
             }
         }
-        if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kA))
+        if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kX))
         {
-            if (isInConeMode)
+            if (CubeClose)
             {
-                disableCone();
+                CubeClose = false;
+                enableCube();
             }
             else
             {
+                CubeClose = true;
                 disableCube();
             }
         }
@@ -55,7 +52,7 @@ public class Pneumatics {
 
     public Pneumatics()
     {
-        Lift = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2, 3);
+        Lift = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 2, 3);
         Cube = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 4, 5);
         Cone = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 0, 1);
     }
