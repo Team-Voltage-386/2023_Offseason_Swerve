@@ -23,6 +23,18 @@ public class Drivetrain {
     public static final double kMaxSpeed = 0.1; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
+    private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
+            ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset);
+    private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
+            ID.kFrontRightCANCoder, Offsets.kFrontRightOffset);
+    private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
+            ID.kBackLeftCANCoder,
+            Offsets.kBackLeftOffset);
+    private final SwerveModule m_backRight = new SwerveModule("BackRight", ID.kBackRightDrive, ID.kBackRightTurn,
+            ID.kBackRightCANCoder, Offsets.kBackRightOffset);
+
+    private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
+
     private final Translation2d m_frontLeftLocation = new Translation2d(
             DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXForward,
             DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYLeft);
@@ -35,18 +47,6 @@ public class Drivetrain {
     private final Translation2d m_backRightLocation = new Translation2d(
             DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXBackward,
             DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYRight);
-
-    private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
-            ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset);
-    private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
-            ID.kFrontRightCANCoder, Offsets.kFrontRightOffset);
-    private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
-            ID.kBackLeftCANCoder,
-            Offsets.kBackLeftOffset);
-    private final SwerveModule m_backRight = new SwerveModule("BackRight", ID.kBackRightDrive, ID.kBackRightTurn,
-            ID.kBackRightCANCoder, Offsets.kBackRightOffset);
-
-    private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
 
     /**
      * The order that you initialize these is important! Later uses of functions
