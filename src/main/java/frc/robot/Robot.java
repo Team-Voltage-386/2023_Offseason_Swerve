@@ -6,8 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
+// import edu.wpi.first.wpilibj.DoubleSolenoid;
+// import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.Deadbands;
@@ -27,13 +27,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        driveWithJoystick(false);
+        driveBackwardsAuto(true);
         m_swerve.updateOdometry();
     }
 
     @Override
     public void teleopPeriodic() {
         driveWithJoystick(true);
+        m_swerve.updateOdometry();
     }
 
     @Override
@@ -41,6 +42,19 @@ public class Robot extends TimedRobot {
         // Only needed when measuring and configuring the encoder offsets. Can comment
         // out when not used
         m_swerve.print();
+    }
+
+    private void driveBackwardsAuto(boolean fieldRelative) {
+        //drive backwards at half max speed
+        final var xSpeed = -m_xspeedLimiter.calculate(0.5) * Drivetrain.kMaxSpeed;
+
+        // Get the y speed or sideways/strafe speed which should be 0
+        final var ySpeed = 0;
+
+        // dont spin
+        final var rot = 0;
+
+        m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
     }
 
     private void driveWithJoystick(boolean fieldRelative) {
