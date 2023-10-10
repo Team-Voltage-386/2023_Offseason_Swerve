@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        while(Timer.getFPGATimestamp() < 1);
+        if(Timer.getFPGATimestamp() < 1);
         driveBackwardsAuto(true);
         
         m_swerve.updateOdometry();
