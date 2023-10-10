@@ -9,6 +9,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 // import edu.wpi.first.wpilibj.DoubleSolenoid;
 // import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.Deadbands;
 import frc.robot.Constants.Controller;;
@@ -27,7 +28,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
+        while(Timer.getFPGATimestamp() < 1);
         driveBackwardsAuto(true);
+        
         m_swerve.updateOdometry();
     }
 
