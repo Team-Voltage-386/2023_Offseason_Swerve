@@ -9,11 +9,11 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -72,10 +72,10 @@ public class SwerveModule {
     // Example code came with these feed forward pieces which we haven't yet added
     // as they are meant for tuning and are not required
     // We leave them here in case you'd like to reference them
-    // private final SimpleMotorFeedforward m_driveFeedforward = new
-    // SimpleMotorFeedforward(1, 3);
-    // private final SimpleMotorFeedforward m_turnFeedforward = new
-    // SimpleMotorFeedforward(1, 0.5);
+    private final SimpleMotorFeedforward m_driveFeedforward = new
+    SimpleMotorFeedforward(1, 3);
+    private final SimpleMotorFeedforward m_turnFeedforward = new
+    SimpleMotorFeedforward(1, 0.5);
 
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder
@@ -234,16 +234,16 @@ public class SwerveModule {
 
         // Left in from the example code we adapted, this is not required for actual use
         // but is left in case you want to try using it
-        // final double driveFeedforward =
-        // m_driveFeedforward.calculate(state.speedMetersPerSecond);
+        final double driveFeedforward =
+        m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
         // Left in from the example code we adapted, this is not required for actual use
         // but is left in case you want to try using it
-        // final double turnFeedforward =
-        // m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
+        final double turnFeedforward =
+        m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
-        m_driveMotor.set(driveOutput); // + driveFeedforward);
-        m_turningMotor.set(turnOutput); // + turnFeedforward);
+        m_driveMotor.set(driveOutput + driveFeedforward);
+        m_turningMotor.set(turnOutput + turnFeedforward);
 
         SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
         SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position", state.angle.getRadians());
