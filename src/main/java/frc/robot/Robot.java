@@ -29,11 +29,17 @@ public class Robot extends TimedRobot {
 
     private final SendableChooser<Integer> autoChooser = new SendableChooser<>();
 
+    int m_autonomousCommand;
+
+    double autoStartTime;
+    double time;
+
     @Override
     public void robotInit()
     {
         autoChooser.addOption("Backup", 1);
         autoChooser.addOption("Score and backup", 2);
+        autoChooser.addOption("Letgo", 3);
         autoChooser.addOption("Null", 0);
         Shuffleboard.getTab("Main").add("AutoRoutine", autoChooser).withSize(3, 1).withPosition(4, 2);
     }
@@ -44,6 +50,13 @@ public class Robot extends TimedRobot {
 
     }
 
+    @Override
+    public void autonomousInit() {
+        m_autonomousCommand = autoChooser.getSelected();
+        autoStartTime = Timer.getFPGATimestamp();
+
+    }
+
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(Controller.kRateLimitXSpeed);
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(Controller.kRateLimitYSpeed);
@@ -51,17 +64,23 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        int m_autonomousCommand=autoChooser.getSelected();
         if (m_autonomousCommand==1)
         {
-            if(Timer.getFPGATimestamp() < 1)
-            {
-                driveBackwardsAuto(true);
-            }
+            driveBackwardsAuto(true);
+        }
+
+        if (m_autonomousCommand==2)
+        {
+                driveBackwardsAndLetGoAuto(true);
+        }
+
+        if(m_autonomousCommand == 3) {
+            LetGoAuto();
         }
         
         
         m_swerve.updateOdometry();
+        time = Timer.getFPGATimestamp() - autoStartTime;
     }
 
     @Override
@@ -78,16 +97,67 @@ public class Robot extends TimedRobot {
     }
 
     private void driveBackwardsAuto(boolean fieldRelative) {
-        //drive backwards at half max speed
-        final var xSpeed = -m_xspeedLimiter.calculate(0.2) * Drivetrain.kMaxSpeed;
+        if(time < 9.5)
+            {
+                System.out.println(time);
+                //drive backwards at half max speed
+                final var xSpeed = -m_xspeedLimiter.calculate(0.3) * Drivetrain.kMaxSpeed;
 
-        // Get the y speed or sideways/strafe speed which should be 0
-        final var ySpeed = 0;
+                // Get the y speed or sideways/strafe speed which should be 0
+                final var ySpeed = 0;
 
-        // dont spin
-        final var rot = 0;
+                // dont spin
+                final var rot = 0;
 
-        m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+                m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+            }
+        else {m_swerve.drive(0, 0, 0, fieldRelative);}
+    }
+
+    boolean flag = false;
+    boolean flag2 = false;
+    private void driveBackwardsAndLetGoAuto(boolean fieldRelative) {
+        if(time < 10.5) {
+            if(!flag) {
+                m_Pneumatics.disableLift();
+                flag = true;
+            }
+
+            if(!flag2 && time > 1) {
+                m_Pneumatics.disableCone();
+                m_Pneumatics.enableCube();
+                flag2 = true;
+            }
+
+            if(flag2) {
+                //drive backwards at half max speed
+                final var xSpeed = -m_xspeedLimiter.calculate(0.3) * Drivetrain.kMaxSpeed;
+
+                // Get the y speed or sideways/strafe speed which should be 0
+                final var ySpeed = 0;
+
+                // dont spin
+                final var rot = 0;
+
+                m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+            }
+        }
+        else {
+            m_swerve.drive(0, 0, 0, fieldRelative);
+        }
+    }
+
+    private void LetGoAuto() {
+        if(!flag) {
+            m_Pneumatics.disableLift();
+            flag = true;
+        }
+
+        if(!flag2 && time > 2) {
+            m_Pneumatics.disableCone();
+            m_Pneumatics.enableCube();
+            flag2 = true;
+        }
     }
 
     private void driveWithJoystick(boolean fieldRelative) {
