@@ -72,10 +72,10 @@ public class SwerveModule {
     // Example code came with these feed forward pieces which we haven't yet added
     // as they are meant for tuning and are not required
     // We leave them here in case you'd like to reference them
-    private final SimpleMotorFeedforward m_driveFeedforward = new
-    SimpleMotorFeedforward(1, 3);
-    private final SimpleMotorFeedforward m_turnFeedforward = new
-    SimpleMotorFeedforward(1, 0.5);
+    // private final SimpleMotorFeedforward m_driveFeedforward = new
+    // SimpleMotorFeedforward(1, 3);
+    // private final SimpleMotorFeedforward m_turnFeedforward = new
+    // SimpleMotorFeedforward(1, 0.5);
 
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder
@@ -228,22 +228,22 @@ public class SwerveModule {
 
         // Left in from the example code we adapted, this is not required for actual use
         // but is left in case you want to try using it
-        final double driveFeedforward =
-        m_driveFeedforward.calculate(state.speedMetersPerSecond);
+        // final double driveFeedforward =
+        // m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
-        // Left in from the example code we adapted, this is not required for actual use
-        // but is left in case you want to try using it
-        final double turnFeedforward =
-        m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
+        // // Left in from the example code we adapted, this is not required for actual use
+        // // but is left in case you want to try using it
+        // final double turnFeedforward =
+        // m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
-        m_driveMotor.setVoltage(driveOutput + driveFeedforward);
-        m_turningMotor.setVoltage(turnOutput + turnFeedforward);
+        m_driveMotor.setVoltage(driveOutput); // + driveFeedforward);
+        m_turningMotor.setVoltage(turnOutput); // + turnFeedforward);
 
         SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
         SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position", state.angle.getRadians());
         SmartDashboard.putNumber(m_swerveModuleName + " Diff Turning Position", getActualTurningPosition() - state.angle.getRadians());
-        SmartDashboard.putNumber(m_swerveModuleName + " Drive Output Voltage", driveOutput + driveFeedforward);
-        SmartDashboard.putNumber(m_swerveModuleName + " Turning Output Voltage", turnOutput + turnFeedforward);
+        SmartDashboard.putNumber(m_swerveModuleName + " Drive Output Voltage", driveOutput); // + driveFeedforward);
+        SmartDashboard.putNumber(m_swerveModuleName + " Turning Output Voltage", turnOutput); // + turnFeedforward);
         SmartDashboard.putNumber(m_swerveModuleName + " Drive Velocity", m_driveMotor.getEncoder().getVelocity());
     }
 
