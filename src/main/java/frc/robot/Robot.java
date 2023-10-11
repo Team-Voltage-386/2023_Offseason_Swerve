@@ -12,10 +12,13 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Commands.ManipulatorCommands;
 import frc.robot.Constants.Deadbands;
-import frc.robot.Constants.Controller;;
+import frc.robot.Constants.Controller;
 
 public class Robot extends TimedRobot {
     private final XboxController m_controller = new XboxController(Controller.kDriveController);
@@ -23,6 +26,18 @@ public class Robot extends TimedRobot {
 
     private Pneumatics m_Pneumatics = new Pneumatics();
     private final ManipulatorCommands m_manipulatorCommand = new ManipulatorCommands(m_Pneumatics);
+
+    private final SendableChooser<Integer> autoChooser = new SendableChooser<>();
+
+    @Override
+    public void robotInit()
+    {
+        autoChooser.addOption("Backup", 1);
+        autoChooser.addOption("Score and backup", 2);
+        autoChooser.addOption("Null", 0);
+        Shuffleboard.getTab("Main").add("AutoRoutine", autoChooser).withSize(3, 1).withPosition(4, 2);
+    }
+
 
     @Override
     public void teleopInit() {
@@ -36,8 +51,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        if(Timer.getFPGATimestamp() < 1);
-        driveBackwardsAuto(true);
+        int m_autonomousCommand=autoChooser.getSelected();
+        if (m_autonomousCommand==1)
+        {
+            if(Timer.getFPGATimestamp() < 1)
+            {
+                driveBackwardsAuto(true);
+            }
+        }
+        
         
         m_swerve.updateOdometry();
     }
@@ -57,7 +79,7 @@ public class Robot extends TimedRobot {
 
     private void driveBackwardsAuto(boolean fieldRelative) {
         //drive backwards at half max speed
-        final var xSpeed = -m_xspeedLimiter.calculate(0.5) * Drivetrain.kMaxSpeed;
+        final var xSpeed = -m_xspeedLimiter.calculate(0.2) * Drivetrain.kMaxSpeed;
 
         // Get the y speed or sideways/strafe speed which should be 0
         final var ySpeed = 0;
