@@ -11,10 +11,11 @@ public class Pneumatics {
     private DoubleSolenoid Cone;
     private boolean ConeClose=false;
     private boolean CubeClose=false;
+    private boolean liftOut=true;
 
     public void controls()
     {
-        if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kY))
+        if (ControllerConstants.kManipulator.getRawButtonPressed(ControllerConstants.kY))
         {
             if (ConeClose)
             {
@@ -27,7 +28,7 @@ public class Pneumatics {
                 disableCone();
             }
         }
-        if (ControllerConstants.kManipulator.getRawButton(ControllerConstants.kX))
+        if (ControllerConstants.kManipulator.getRawButtonPressed(ControllerConstants.kX))
         {
             if (CubeClose)
             {
@@ -42,11 +43,19 @@ public class Pneumatics {
         }
         if (ControllerConstants.kManipulator.getRawAxis(ControllerConstants.kRightTrigger)>0.02)
         {
-            enableLift();
+            if (!liftOut)
+            {
+                liftOut=true;
+                disableLift();
+            }
         }
         else
         {
-            disableLift();
+            if (liftOut)
+            {
+                liftOut = false;
+                enableLift();
+            }
         }
     }
 
