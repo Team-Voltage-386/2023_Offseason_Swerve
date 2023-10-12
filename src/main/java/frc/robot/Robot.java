@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import java.util.Map;
+
 import Subsytems.Pneumatics;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -12,6 +16,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +34,8 @@ public class Robot extends TimedRobot {
 
     private final SendableChooser<Integer> autoChooser = new SendableChooser<>();
 
+    private final UsbCamera m_camera = CameraServer.startAutomaticCapture(0);
+
     int m_autonomousCommand;
 
     double autoStartTime;
@@ -37,6 +44,9 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit()
     {
+        m_camera.setResolution(400, 300);
+        m_camera.setFPS(30);
+        Shuffleboard.getTab("Main").add(m_camera).withWidget(BuiltInWidgets.kCameraStream).withPosition(0, 0).withSize(4, 4).withProperties(Map.of("Rotation","NONE"));
         autoChooser.addOption("Backup", 1);
         autoChooser.addOption("Score and backup", 2);
         autoChooser.addOption("Letgo", 3);
@@ -87,6 +97,7 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         driveWithJoystick(true);
         m_swerve.updateOdometry();
+        m_Pneumatics.controls();
     }
 
     @Override
