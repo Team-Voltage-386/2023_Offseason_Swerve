@@ -4,21 +4,29 @@
 
 package frc.robot;
 
+import Subsytems.Pneumatics;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Commands.ManipulatorCommands;
 import frc.robot.Constants.Deadbands;
 import frc.robot.Constants.Controller;;
 
 public class Robot extends TimedRobot {
-    // private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(0,
-    // PneumaticsModuleType.CTREPCM, 0, 1);
-
     private final XboxController m_controller = new XboxController(Controller.kDriveController);
     private final Drivetrain m_swerve = new Drivetrain();
+
+    private Pneumatics m_Pneumatics = new Pneumatics();
+    private final ManipulatorCommands m_manipulatorCommand = new ManipulatorCommands(m_Pneumatics);
+
+    @Override
+    public void teleopInit() {
+
+    }
 
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(Controller.kRateLimitXSpeed);
@@ -34,13 +42,14 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         driveWithJoystick(true);
+        m_Pneumatics.controls();
     }
 
     @Override
     public void disabledPeriodic() {
         // Only needed when measuring and configuring the encoder offsets. Can comment
         // out when not used
-        m_swerve.print();
+        // m_swerve.print();
     }
 
     private void driveWithJoystick(boolean fieldRelative) {
