@@ -14,11 +14,13 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
@@ -69,13 +71,16 @@ public class SwerveModule {
 
     private final ProfiledPIDController m_turningPIDController;
 
+    private double m_turningLastSpeed = 0;
+    private double m_turningLastTime = Timer.getFPGATimestamp();
+    private double m_turningLastPosition = 0;
+
     // Example code came with these feed forward pieces which we haven't yet added
     // as they are meant for tuning and are not required
     // We leave them here in case you'd like to reference them
     // private final SimpleMotorFeedforward m_driveFeedforward = new
     // SimpleMotorFeedforward(1, 3);
-    // private final SimpleMotorFeedforward m_turnFeedforward = new
-    // SimpleMotorFeedforward(1, 0.5);
+    private final SimpleMotorFeedforward m_turnFeedforward;
 
     /**
      * Constructs a SwerveModule with a drive motor, turning motor, drive encoder
@@ -95,7 +100,8 @@ public class SwerveModule {
             int turningEncoderID,
             double encoderOffset,
             double[] steerPID,
-            double[] drivePID) {
+            double[] drivePID,
+            double[] turnFeedForward) {
 
         m_drivePIDController = new PIDController(
                 drivePID[0],
@@ -145,6 +151,8 @@ public class SwerveModule {
         m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
         m_encoderOffset = encoderOffset;
+
+        m_turnFeedforward = new SimpleMotorFeedforward(turnFeedForward[0], turnFeedForward[1]);
     }
 
     /**
@@ -198,6 +206,30 @@ public class SwerveModule {
         m_drivePIDController.reset();
     }
 
+    // Controls a simple motor's position using a SimpleMotorFeedforward
+    // and a ProfiledPIDController
+    public void goToPosition(double goalPosition) {
+        double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
+        double acceleration = (m_turningPIDController.getSetpoint().velocity - this.m_turningLastSpeed)
+                / (Timer.getFPGATimestamp() - this.m_turningLastTime);
+
+        double currentPosition = this.getActualTurningPosition();
+
+        double targetVelocity = m_turningPIDController.getSetpoint().velocity;
+        double actualVelocity = (currentPosition - this.m_turningLastPosition)
+                / (Timer.getFPGATimestamp() - this.m_turningLastTime);
+
+        SmartDashboard.putNumber(this.m_swerveModuleName + " Target Velocity", targetVelocity);
+        SmartDashboard.putNumber(this.m_swerveModuleName + " Actual Velocity", actualVelocity);
+
+        m_turningMotor.setVoltage(
+                pidVal
+                        + m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration));
+        this.m_turningLastSpeed = m_turningPIDController.getSetpoint().velocity;
+        this.m_turningLastTime = Timer.getFPGATimestamp();
+        this.m_turningLastPosition = currentPosition;
+    }
+
     /**
      * Sets the desired state for the module.
      *
@@ -209,28 +241,30 @@ public class SwerveModule {
         SwerveModuleState state = SwerveModuleState.optimize(desiredState,
                 new Rotation2d(getActualTurningPosition()));
 
-        if (state.speedMetersPerSecond < 0.05) {
-            this.resetDriveError();
-        }
+        // if (state.speedMetersPerSecond < 0.05) {
+        // this.resetDriveError();
+        // }
 
         // Calculate the drive output from the drive PID controller.
         final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getEncoder().getVelocity(),
                 state.speedMetersPerSecond);
 
         // Calculate the turning motor output from the turning PID controller.
-        double turnOutput = m_turningPIDController.calculate(
-                getActualTurningPosition(),
-                state.angle.getRadians());
+        // double turnOutput = m_turningPIDController.calculate(
+        // getActualTurningPosition(),
+        // state.angle.getRadians());
 
-        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output Before Mod", turnOutput);
+        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output Before Mod",
+        // turnOutput);
         // Limit turn output between -1 and 1 for turning motor
         // if (turnOutput < -1) {
-        //     turnOutput = -1.0;
+        // turnOutput = -1.0;
         // }
         // if (turnOutput > 1) {
-        //     turnOutput = 1.0;
+        // turnOutput = 1.0;
         // }
-        //SmartDashboard.putNumber(m_swerveModuleName + " Turning Output After Mod", turnOutput);
+        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output After Mod",
+        // turnOutput);
 
         // Left in from the example code we adapted, this is not required for actual use
         // but is left in case you want to try using it
@@ -242,16 +276,19 @@ public class SwerveModule {
         // final double turnFeedforward =
         // m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
-        m_driveMotor.set(driveOutput); // + driveFeedforward);
-        m_turningMotor.set(turnOutput); // + turnFeedforward);
+        // m_driveMotor.set(driveOutput); // + driveFeedforward);
+        // m_turningMotor.set(turnOutput); // + turnFeedforward);
 
-        SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
-        SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position", state.angle.getRadians());
-        SmartDashboard.putNumber(m_swerveModuleName + " Diff Turning Position",
-                getActualTurningPosition() - state.angle.getRadians());
-        SmartDashboard.putNumber(m_swerveModuleName + " Drive Output", driveOutput);
-        SmartDashboard.putNumber(m_swerveModuleName + " Turning Output", turnOutput);
-        SmartDashboard.putNumber(m_swerveModuleName + " Drive Velocity", m_driveMotor.getEncoder().getVelocity());
+        this.goToPosition(state.angle.getRadians());
+
+        // SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position",
+        // getActualTurningPosition());
+        // SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position",
+        // state.angle.getRadians());
+        // SmartDashboard.putNumber(m_swerveModuleName + " Drive Output", driveOutput);
+        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output", turnOutput);
+        // SmartDashboard.putNumber(m_swerveModuleName + " Drive Velocity",
+        // m_driveMotor.getEncoder().getVelocity());
     }
 
     /**
