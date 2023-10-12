@@ -95,7 +95,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        driveWithJoystick(true);
+        if(m_controller.getLeftBumper())
+            driveWithJoystick(false);
+        else
+            driveWithJoystick(true);
+            
         m_swerve.updateOdometry();
         m_Pneumatics.controls();
     }
