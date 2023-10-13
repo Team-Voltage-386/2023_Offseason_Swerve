@@ -27,21 +27,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Represents a swerve drive style drivetrain. */
-public class Drivetrain extends SubsystemBase {
-    public static final double kMaxSpeed = 0.1; // meters per second (could be 3 (was for other robot) when not testing)
+public class Drivetrain extends SubsystemBase{
+    public static final double kMaxSpeed = 2.0; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
-
-    private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
-            ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset);
-    private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
-            ID.kFrontRightCANCoder, Offsets.kFrontRightOffset);
-    private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
-            ID.kBackLeftCANCoder,
-            Offsets.kBackLeftOffset);
-    private final SwerveModule m_backRight = new SwerveModule("BackRight", ID.kBackRightDrive, ID.kBackRightTurn,
-            ID.kBackRightCANCoder, Offsets.kBackRightOffset);
-
-    private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
 
     private final Translation2d m_frontLeftLocation = new Translation2d(
             DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXForward,
@@ -55,6 +43,30 @@ public class Drivetrain extends SubsystemBase {
     private final Translation2d m_backRightLocation = new Translation2d(
             DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXBackward,
             DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYRight);
+
+    private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
+            ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset,
+            new double[] { 1.0, 1.0,
+                    0.0 }, // 0.1, 0.5, 0.008
+            new double[] { 0.1, 0.5, 0.008 });
+    private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
+            ID.kFrontRightCANCoder, Offsets.kFrontRightOffset,
+            new double[] { 1.0, 1.0,
+                    0.0 },
+            new double[] { 0.1, 0.5, 0.008 });
+    private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
+            ID.kBackLeftCANCoder,
+            Offsets.kBackLeftOffset,
+            new double[] { 1.0, 1.0,
+                    0.0 },
+            new double[] { 0.1, 0.5, 0.008 });
+    private final SwerveModule m_backRight = new SwerveModule("BackRight", ID.kBackRightDrive, ID.kBackRightTurn,
+            ID.kBackRightCANCoder, Offsets.kBackRightOffset,
+            new double[] { 1.0, 1.0,
+                    0.0 },
+            new double[] { 0.1, 0.5, 0.008 });
+
+    private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
 
     /**
      * The order that you initialize these is important! Later uses of functions
@@ -76,6 +88,11 @@ public class Drivetrain extends SubsystemBase {
         // Zero at beginning of match to know what way is forward
         // NOTE: This requires that the robot starts forward
         m_gyro.zeroGyroBiasNow();
+        this.resetGyro();
+    }
+
+    public void resetGyro() {
+        m_gyro.setYaw(0);
     }
 
     /**

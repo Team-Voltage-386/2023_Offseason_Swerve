@@ -4,16 +4,68 @@
 
 package frc.robot;
 
+import java.util.Map;
+
+import Subsytems.Pneumatics;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Commands.ManipulatorCommands;
 import frc.robot.Constants.Deadbands;
-import frc.robot.Constants.Controller;;
+import frc.robot.Constants.Controller;
 
 public class Robot extends TimedRobot {
     private final XboxController m_controller = new XboxController(Controller.kDriveController);
     private final Drivetrain m_swerve = new Drivetrain();
+
+    private Pneumatics m_Pneumatics = new Pneumatics();
+    private final ManipulatorCommands m_manipulatorCommand = new ManipulatorCommands(m_Pneumatics);
+
+    private final SendableChooser<Integer> autoChooser = new SendableChooser<>();
+
+    private final UsbCamera m_camera = CameraServer.startAutomaticCapture(0);
+
+    int m_autonomousCommand;
+
+    double autoStartTime;
+    double time;
+
+    @Override
+    public void robotInit()
+    {
+        m_camera.setResolution(400, 300);
+        m_camera.setFPS(30);
+        Shuffleboard.getTab("Main").add(m_camera).withWidget(BuiltInWidgets.kCameraStream).withPosition(0, 0).withSize(4, 4).withProperties(Map.of("Rotation","NONE"));
+        autoChooser.addOption("Backup", 1);
+        autoChooser.addOption("Score and backup", 2);
+        autoChooser.addOption("Letgo", 3);
+        autoChooser.addOption("Null", 0);
+        Shuffleboard.getTab("Main").add("AutoRoutine", autoChooser).withSize(3, 1).withPosition(4, 2);
+    }
+
+
+    @Override
+    public void teleopInit() {
+
+    }
+
+    @Override
+    public void autonomousInit() {
+        m_autonomousCommand = autoChooser.getSelected();
+        autoStartTime = Timer.getFPGATimestamp();
+
+    }
 
     // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(Controller.kRateLimitXSpeed);
@@ -22,13 +74,34 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        driveWithJoystick(false);
+        if (m_autonomousCommand==1)
+        {
+            driveBackwardsAuto(true);
+        }
+
+        if (m_autonomousCommand==2)
+        {
+                driveBackwardsAndLetGoAuto(true);
+        }
+
+        if(m_autonomousCommand == 3) {
+            LetGoAuto();
+        }
+        
+        
         m_swerve.updateOdometry();
+        time = Timer.getFPGATimestamp() - autoStartTime;
     }
 
     @Override
     public void teleopPeriodic() {
-        driveWithJoystick(true);
+        if(m_controller.getLeftBumper())
+            driveWithJoystick(false);
+        else
+            driveWithJoystick(true);
+            
+        m_swerve.updateOdometry();
+        m_Pneumatics.controls();
     }
 
     @Override
@@ -36,6 +109,70 @@ public class Robot extends TimedRobot {
         // Only needed when measuring and configuring the encoder offsets. Can comment
         // out when not used
         m_swerve.print();
+    }
+
+    private void driveBackwardsAuto(boolean fieldRelative) {
+        if(time < 9.5)
+            {
+                System.out.println(time);
+                //drive backwards at half max speed
+                final var xSpeed = -m_xspeedLimiter.calculate(0.3) * Drivetrain.kMaxSpeed;
+
+                // Get the y speed or sideways/strafe speed which should be 0
+                final var ySpeed = 0;
+
+                // dont spin
+                final var rot = 0;
+
+                m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+            }
+        else {m_swerve.drive(0, 0, 0, fieldRelative);}
+    }
+
+    boolean flag = false;
+    boolean flag2 = false;
+    private void driveBackwardsAndLetGoAuto(boolean fieldRelative) {
+        if(time < 10.5) {
+            if(!flag) {
+                m_Pneumatics.disableLift();
+                flag = true;
+            }
+
+            if(!flag2 && time > 1) {
+                m_Pneumatics.disableCone();
+                m_Pneumatics.enableCube();
+                flag2 = true;
+            }
+
+            if(flag2) {
+                //drive backwards at half max speed
+                final var xSpeed = -m_xspeedLimiter.calculate(0.3) * Drivetrain.kMaxSpeed;
+
+                // Get the y speed or sideways/strafe speed which should be 0
+                final var ySpeed = 0;
+
+                // dont spin
+                final var rot = 0;
+
+                m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+            }
+        }
+        else {
+            m_swerve.drive(0, 0, 0, fieldRelative);
+        }
+    }
+
+    private void LetGoAuto() {
+        if(!flag) {
+            m_Pneumatics.disableLift();
+            flag = true;
+        }
+
+        if(!flag2 && time > 2) {
+            m_Pneumatics.disableCone();
+            m_Pneumatics.enableCube();
+            flag2 = true;
+        }
     }
 
     private void driveWithJoystick(boolean fieldRelative) {
@@ -61,5 +198,9 @@ public class Robot extends TimedRobot {
                 * Drivetrain.kMaxAngularSpeed;
 
         m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+
+        if (m_controller.getRightBumperPressed()) {
+            m_swerve.resetGyro();
+        }
     }
 }
