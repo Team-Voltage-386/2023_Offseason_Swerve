@@ -74,15 +74,15 @@ public class Drivetrain extends SubsystemBase{
      * See
      * https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html
      */
-    private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+    public final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
             m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-    private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+    public final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
             m_kinematics,
             getGyroYawRotation2d(),
             getModulePositions());
 
-    ChassisSpeeds m_chassisSpeeds = m_kinematics.toChassisSpeeds(getModuleStates());
+    public ChassisSpeeds m_chassisSpeeds = m_kinematics.toChassisSpeeds(getModuleStates());
 
     public Drivetrain() {
         // Zero at beginning of match to know what way is forward
@@ -188,10 +188,10 @@ public class Drivetrain extends SubsystemBase{
 
     /**
      * resets odometry using the current rotation, the current module positions, and a Pose2d
-     * @param initialHolonomicPose
+     * @param roboPose
      */
-    public void resetOdometry(Pose2d initialHolonomicPose) {
-        m_odometry.resetPosition(getGyroYawRotation2d(), getModulePositions(), initialHolonomicPose);
+    public void resetOdometry(Pose2d roboPose) {
+        m_odometry.resetPosition(getGyroYawRotation2d(), getModulePositions(), roboPose);
     }
 
     /**
@@ -207,10 +207,28 @@ public class Drivetrain extends SubsystemBase{
         };
     }
 
+    public Pose2d calcRoboPose2dWithVision() {
+        double L = 1; //dist between the two april tags
+        double a1 = 15; //placeholder values, angle (from the camera) of the close april tag (a1) and the far april tag (a2)
+        double a2 = 20;
+        double roboAngle = m_gyro.getYaw(); //angle of the robot (0 degrees = facing the drivers)
+
+        double X = (L * Math.sin(Math.toRadians(90 + roboAngle + a2)) * Math.sin(Math.toRadians(90 - roboAngle - a1)))
+                        /Math.sin(Math.toRadians(Math.abs(a2 - a1)));
+
+        double Y = (L * Math.sin(Math.toRadians(90 + roboAngle + a2)) * Math.cos(Math.toRadians(90 - roboAngle - a1)))
+                        /Math.sin(Math.toRadians(Math.abs(a2 - a1)));
+
+        return new Pose2d(X, Y, getGyroYawRotation2d());
+    }
+
 /** Updates the field relative position of the robot. */
     public void updateOdometry() {
         m_odometry.update(
                 getGyroYawRotation2d(),
                 getModulePositions());
+        if(Math.abs(m_gyro.getPitch()) > 4 || Math.abs(m_gyro.getRoll()) > 4) {
+                
+        }
     }
 }
