@@ -209,7 +209,6 @@ public class SwerveModule {
     // Controls a simple motor's position using a SimpleMotorFeedforward
     // and a ProfiledPIDController
     public void goToPosition(double goalPosition) {
-        double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
         double acceleration = (m_turningPIDController.getSetpoint().velocity - this.m_turningLastSpeed)
                 / (Timer.getFPGATimestamp() - this.m_turningLastTime);
 
@@ -219,12 +218,15 @@ public class SwerveModule {
         double actualVelocity = (currentPosition - this.m_turningLastPosition)
                 / (Timer.getFPGATimestamp() - this.m_turningLastTime);
 
+        double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
+        double FFVal = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration);
+
         SmartDashboard.putNumber(this.m_swerveModuleName + " Target Velocity", targetVelocity);
         SmartDashboard.putNumber(this.m_swerveModuleName + " Actual Velocity", actualVelocity);
-
+        SmartDashboard.putNumber(this.m_swerveModuleName + " Output Voltage", pidVal + FFVal);
         m_turningMotor.setVoltage(
                 pidVal
-                        + m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration));
+                + FFVal);
         this.m_turningLastSpeed = m_turningPIDController.getSetpoint().velocity;
         this.m_turningLastTime = Timer.getFPGATimestamp();
         this.m_turningLastPosition = currentPosition;
