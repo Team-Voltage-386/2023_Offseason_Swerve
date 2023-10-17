@@ -42,12 +42,12 @@ public class Drivetrain {
             ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset,
             kSwerveTurnPID, // 0.1, 0.5, 0.008
             new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.05, 0.4 });
+            new double[] { 0.1, 0.4 });
     private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
             ID.kFrontRightCANCoder, Offsets.kFrontRightOffset,
             kSwerveTurnPID,
             new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.0, 0.4 });
+            new double[] { 0.1, 0.4 });
     private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
             ID.kBackLeftCANCoder,
             Offsets.kBackLeftOffset,
