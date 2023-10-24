@@ -121,15 +121,15 @@ public class Drivetrain {
      *
      * @param xSpeed        Speed of the robot in the x direction (forward).
      * @param ySpeed        Speed of the robot in the y direction (sideways).
-     * @param rot           Angular rate of the robot.
+     * @param rotSpeed           Angular rate of the robot.
      * @param fieldRelative Whether the provided x and y speeds are relative to the
      *                      field.
      */
-    public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
         SwerveModuleState[] swerveModuleStates = m_kinematics.toSwerveModuleStates(
                 fieldRelative
-                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getGyroYawRotation2d())
-                        : new ChassisSpeeds(xSpeed, ySpeed, rot));
+                        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getGyroYawRotation2d())
+                        : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)); // ADD WHEN WPILIB UPDATE: ChassisSpeeds.fromRobotRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getGyroYawRotation2d());
 
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
