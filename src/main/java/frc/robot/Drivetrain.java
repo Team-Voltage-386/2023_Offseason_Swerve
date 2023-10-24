@@ -9,7 +9,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;\
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -20,7 +20,7 @@ import frc.robot.Constants.DriveTrain;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-    public static final double kMaxSpeed = 2.0; // meters per second (could be 3 (was for other robot) when not testing)
+    public static final double kMaxSpeed = 1.0; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
     private final Translation2d m_frontLeftLocation = new Translation2d(
@@ -40,26 +40,30 @@ public class Drivetrain {
 
     private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
             ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset,
-            kSwerveTurnPID, // 0.1, 0.5, 0.008
+            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
             new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.1, 0.4 });
+            new double[] { 0.11, 0.4 },
+            new double[] { 0.0, 2.81 });
     private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
             ID.kFrontRightCANCoder, Offsets.kFrontRightOffset,
-            kSwerveTurnPID,
+            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
             new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.1, 0.4 });
+            new double[] { 0.11, 0.4 },
+            new double[] { 0, 2.81 });
     private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
             ID.kBackLeftCANCoder,
             Offsets.kBackLeftOffset,
-            kSwerveTurnPID,
+            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
             new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.0, 0.0 });
+            new double[] { 0.11, 0.4 },
+            new double[] { 0, 2.81 });
     private final SwerveModule m_backRight = new SwerveModule("BackRight", ID.kBackRightDrive, ID.kBackRightTurn,
             ID.kBackRightCANCoder,
             Offsets.kBackRightOffset,
-            kSwerveTurnPID,
+            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
             new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.0, 0.0 });
+            new double[] { 0.11, 0.4 },
+            new double[] { 0, 2.81 });
 
     private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
 
