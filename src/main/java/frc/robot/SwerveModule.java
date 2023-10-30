@@ -121,8 +121,8 @@ public class SwerveModule {
          * Set up the drive motor
          */
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
-        m_driveMotor.getEncoder().setPositionConversionFactor(kEncoderConversionMetersPerRotation);
-        m_driveMotor.getEncoder().setVelocityConversionFactor(kEncoderConversionMetersPerRotation);
+        // m_driveMotor.getEncoder().setPositionConversionFactor(kEncoderConversionMetersPerRotation);
+        // m_driveMotor.getEncoder().setVelocityConversionFactor(kEncoderConversionMetersPerRotation);
 
         /*
          * Set up the turning motor. We had to invert the turning motor so it agreed
@@ -190,7 +190,7 @@ public class SwerveModule {
      * @return distance wheel has gone across the floor. (Circumference*rotations)
      */
     public double getActualDrivePosition() {
-        return m_driveMotor.getEncoder().getPosition();// * 2 * Math.PI * kWheelRadius;
+        return m_driveMotor.getEncoder().getPosition() * 2 * Math.PI * kWheelRadius;
     }
 
     /**

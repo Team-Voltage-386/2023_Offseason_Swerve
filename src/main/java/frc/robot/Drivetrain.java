@@ -15,14 +15,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ID;
 import frc.robot.Constants.Offsets;
 import frc.robot.Constants.DriveTrain;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-    public static final double kMaxSpeed = 1.0; // meters per second (could be 3 (was for other robot) when not testing)
-    public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
+    public static final double kMaxSpeed = 2.0; // meters per second (could be 3 (was for other robot) when not testing)
+    public static final double kMaxAngularSpeed = 2*Math.PI; // 1/2 rotation per second
 
     private final Translation2d m_frontLeftLocation = new Translation2d(
             DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXForward,
@@ -41,30 +42,30 @@ public class Drivetrain {
 
     private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
             ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset,
-            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
-            new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.11, 0.4 },
-            new double[] { 0.0, 2.81 });
+            DriveTrain.turnPID, // p = 6.2
+            DriveTrain.drivePID,
+            DriveTrain.turnFeedForward,
+            DriveTrain.driveFeedForward);
     private final SwerveModule m_frontRight = new SwerveModule("FrontRight", ID.kFrontRightDrive, ID.kFrontRightTurn,
             ID.kFrontRightCANCoder, Offsets.kFrontRightOffset,
-            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
-            new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.11, 0.4 },
-            new double[] { 0, 2.81 });
+            DriveTrain.turnPID, // p = 6.2
+            DriveTrain.drivePID,
+            DriveTrain.turnFeedForward,
+            DriveTrain.driveFeedForward);
     private final SwerveModule m_backLeft = new SwerveModule("BackLeft", ID.kBackLeftDrive, ID.kBackLeftTurn,
             ID.kBackLeftCANCoder,
             Offsets.kBackLeftOffset,
-            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
-            new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.11, 0.4 },
-            new double[] { 0, 2.81 });
+            DriveTrain.turnPID, // p = 6.2
+            DriveTrain.drivePID,
+            DriveTrain.turnFeedForward,
+            DriveTrain.driveFeedForward);
     private final SwerveModule m_backRight = new SwerveModule("BackRight", ID.kBackRightDrive, ID.kBackRightTurn,
             ID.kBackRightCANCoder,
             Offsets.kBackRightOffset,
-            new double[] { 6.2, 0.0, 0.0 }, // p = 6.2
-            new double[] { 0.0, 0.0, 0.0 },
-            new double[] { 0.11, 0.4 },
-            new double[] { 0, 2.81 });
+            DriveTrain.turnPID, // p = 6.2
+            DriveTrain.drivePID,
+            DriveTrain.turnFeedForward,
+            DriveTrain.driveFeedForward);
 
     private final Pigeon2 m_gyro = new Pigeon2(ID.kGyro);
 
@@ -86,6 +87,8 @@ public class Drivetrain {
                     m_backLeft.getPosition(),
                     m_backRight.getPosition()
             });
+
+            private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
 
     public Drivetrain() {
         // Zero at beginning of match to know what way is forward
@@ -139,6 +142,13 @@ public class Drivetrain {
         m_frontRight.setDesiredState(swerveModuleStates[1]);
         m_backLeft.setDesiredState(swerveModuleStates[2]);
         m_backRight.setDesiredState(swerveModuleStates[3]);
+
+        
+
+        SmartDashboard.putNumber("X Speed", xSpeed);
+        SmartDashboard.putNumber("Y Speed", ySpeed);
+        SmartDashboard.putNumber("Rot Speed", rotSpeed);
+        updateOdometry();
     }
 
     public Pose2d calcRoboPose2dWithVision(double length, double angle1, double angle2) {
@@ -167,5 +177,23 @@ public class Drivetrain {
                         m_backLeft.getPosition(),
                         m_backRight.getPosition()
                 });
+
+        var frontLeftState = m_frontLeft.getState();
+        var frontRightState = m_frontRight.getState();
+        var backLeftState = m_backLeft.getState();
+        var backRightState = m_backRight.getState();
+
+        // Convert to chassis speeds
+        m_chassisSpeeds = m_kinematics.toChassisSpeeds(
+        frontLeftState, frontRightState, backLeftState, backRightState);
+
+        // Getting individual speeds
+        double forward = m_chassisSpeeds.vxMetersPerSecond;
+        double sideways = m_chassisSpeeds.vyMetersPerSecond;
+        double angular = m_chassisSpeeds.omegaRadiansPerSecond;
+        
+        SmartDashboard.putNumber("real X speed", forward);
+        SmartDashboard.putNumber("real Y speed", sideways);
+        SmartDashboard.putNumber("real Rot speed", Math.toDegrees(angular));
     }
 }

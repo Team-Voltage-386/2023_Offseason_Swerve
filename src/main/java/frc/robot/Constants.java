@@ -38,6 +38,11 @@ public class Constants {
         public static final int kXBackward = -1;
         public static final int kYLeft = 1;
         public static final int kYRight = -1;
+
+        public static final double[] turnPID = { 0.0, 0.0, 0.0 }; // p = 6.2
+        public static final double[] drivePID = { 0.0, 0.0, 0.0 };
+        public static final double[] turnFeedForward = { 0.11, 0.4 };
+        public static final double[] driveFeedForward = { 0.0, 2.81 }; // v = 2.81
     };
 
     public static class Controller {
