@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Deadbands;
 import frc.robot.Constants.Controller;;
 
@@ -66,6 +67,8 @@ public class Robot extends TimedRobot {
                 * Drivetrain.kMaxAngularSpeed;
 
         m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+        SmartDashboard.putNumber("Input rot speed", MathUtil.applyDeadband(m_controller.getRightX(), Deadbands.kRightJoyStickDeadband));
+        
 
         if (m_controller.getRightBumperPressed()) {
             m_swerve.resetGyro();

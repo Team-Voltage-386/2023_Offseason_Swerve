@@ -113,7 +113,7 @@ public class SwerveModule {
                 steerPID[1],
                 steerPID[2],
                 new TrapezoidProfile.Constraints(
-                        10*kModuleMaxAngularVelocity, 10*kModuleMaxAngularAcceleration));
+                        5*kModuleMaxAngularVelocity, 8*kModuleMaxAngularAcceleration));
 
         m_swerveModuleName = swerveModuleID;
 
@@ -121,6 +121,7 @@ public class SwerveModule {
          * Set up the drive motor
          */
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
+        m_driveMotor.getEncoder().setPosition(0);
         // m_driveMotor.getEncoder().setPositionConversionFactor(kEncoderConversionMetersPerRotation);
         // m_driveMotor.getEncoder().setVelocityConversionFactor(kEncoderConversionMetersPerRotation);
 
@@ -222,11 +223,11 @@ public class SwerveModule {
         double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
         double FFVal = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration);
 
-        SmartDashboard.putNumber(this.m_swerveModuleName + " Target Velocity", targetVelocity);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " Actual Velocity", actualVelocity);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " Output Voltage", pidVal + FFVal);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " Target Position", goalPosition);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " Turning Position", m_turningEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Velocity", targetVelocity);
+        SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
+        SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
+        SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
+        SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", m_turningEncoder.getAbsolutePosition());
         m_turningMotor.setVoltage(
                 pidVal
                 + FFVal);
@@ -250,8 +251,10 @@ public class SwerveModule {
         // this.resetDriveError();
         // }
 
+        double currentMPS = m_driveMotor.getEncoder().getVelocity() * kWheelRadius * Math.PI / 30;
+
         // Calculate the drive output from the drive PID controller.
-        final double driveOutput = m_drivePIDController.calculate(m_driveMotor.getEncoder().getVelocity(),
+        final double driveOutput = m_drivePIDController.calculate(currentMPS,
                 state.speedMetersPerSecond);
 
         // Calculate the turning motor output from the turning PID controller.
@@ -292,7 +295,7 @@ public class SwerveModule {
         // state.angle.getRadians());
         // SmartDashboard.putNumber(m_swerveModuleName + " Drive Output", driveOutput);
         // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output", turnOutput);
-        SmartDashboard.putNumber(m_swerveModuleName + " Drive Actual Velocity", m_driveMotor.getEncoder().getVelocity());
+        SmartDashboard.putNumber(m_swerveModuleName + " Drive Actual Velocity", currentMPS);
         SmartDashboard.putNumber(m_swerveModuleName + " Drive Target Velocity", state.speedMetersPerSecond);
     }
 

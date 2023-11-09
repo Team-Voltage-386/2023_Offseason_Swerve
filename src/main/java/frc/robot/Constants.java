@@ -39,10 +39,10 @@ public class Constants {
         public static final int kYLeft = 1;
         public static final int kYRight = -1;
 
-        public static final double[] turnPID = { 0.0, 0.0, 0.0 }; // p = 6.2
-        public static final double[] drivePID = { 0.0, 0.0, 0.0 };
-        public static final double[] turnFeedForward = { 0.11, 0.4 };
-        public static final double[] driveFeedForward = { 0.0, 2.81 }; // v = 2.81
+        public static final double[] turnPID = { 0.1, 0.0, 0.0 }; // p = 6.2
+        public static final double[] drivePID = { 0.5015, 0.0, 0.0 }; //1.03 is overshooting
+        public static final double[] turnFeedForward = { 0.0, 0.45 }; //was 0.45
+        public static final double[] driveFeedForward = { 0.0, 0.405 }; // v = 0.5
     };
 
     public static class Controller {
