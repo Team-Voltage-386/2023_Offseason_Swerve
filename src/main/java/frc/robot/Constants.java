@@ -39,10 +39,10 @@ public class Constants {
         public static final int kYLeft = 1;
         public static final int kYRight = -1;
 
-        public static final double[] turnPID = { 0.1, 0.0, 0.0 }; // p = 6.2
-        public static final double[] drivePID = { 0.5015, 0.0, 0.0 }; //1.03 is overshooting
-        public static final double[] turnFeedForward = { 0.0, 0.45 }; //was 0.45
-        public static final double[] driveFeedForward = { 0.0, 0.405 }; // v = 0.5
+        public static final double[] turnPID = { 11.25, 0.0, 0.0 }; // p = 11.25
+        public static final double[] drivePID = { 0, 0.0, 0.0 }; //p = 0.825
+        public static final double[] turnFeedForward = { 0.0, 0.46 }; //was 0.45
+        public static final double[] driveFeedForward = { 0.0, 0.405 }; // v = 0.405
     };
 
     public static class Controller {
@@ -58,13 +58,12 @@ public class Constants {
 
     public static class Offsets {
         // Ensure that the encoder offsets are between -Pi & Pi
-
         /**
          * Encoder offsets
          */
-        public static final double kFrontLeftOffset = 3.1032;
-        public static final double kFrontRightOffset = -1.8945;
-        public static final double kBackLeftOffset = -0.8606;
-        public static final double kBackRightOffset = -0.3053;
+        public static final double kFrontLeftOffset = 3.0683;
+        public static final double kFrontRightOffset = -1.8806;
+        public static final double kBackLeftOffset = -0.8590;
+        public static final double kBackRightOffset = -0.3344;
     }
 }

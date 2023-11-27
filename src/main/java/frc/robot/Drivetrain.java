@@ -23,7 +23,7 @@ import frc.robot.Constants.DriveTrain;
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
     public static final double kMaxSpeed = 8.0; // meters per second (could be 3 (was for other robot) when not testing)
-    public static final double kMaxAngularSpeed = 2*Math.PI; // 1/2 rotation per second
+    public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
     private final Translation2d m_frontLeftLocation = new Translation2d(
             DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXForward,

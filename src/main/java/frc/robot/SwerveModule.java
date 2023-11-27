@@ -113,7 +113,7 @@ public class SwerveModule {
                 steerPID[1],
                 steerPID[2],
                 new TrapezoidProfile.Constraints(
-                        5*kModuleMaxAngularVelocity, 8*kModuleMaxAngularAcceleration));
+                        30*kModuleMaxAngularVelocity, 30*kModuleMaxAngularAcceleration)); //dramatically increased max velo
 
         m_swerveModuleName = swerveModuleID;
 
@@ -201,7 +201,15 @@ public class SwerveModule {
      * @return real orientation of wheel.
      */
     public double getActualTurningPosition() {
-        return m_turningEncoder.getAbsolutePosition() - m_encoderOffset;
+        double ans = m_turningEncoder.getAbsolutePosition() - m_encoderOffset;
+        // Correct for wrapping
+        while (ans < Math.PI) {
+            ans += 2*Math.PI;
+        }
+        while (ans > Math.PI) {
+            ans -= 2*Math.PI;
+        }
+        return ans;
     }
 
     public void resetDriveError() {
@@ -227,11 +235,11 @@ public class SwerveModule {
         SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
         SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
         SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", m_turningEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", this.getActualTurningPosition());
         m_turningMotor.setVoltage(
                 pidVal
                 + FFVal);
-        this.m_turningLastSpeed = m_turningPIDController.getSetpoint().velocity;
+        this.m_turningLastSpeed = actualVelocity;
         this.m_turningLastTime = Timer.getFPGATimestamp();
         this.m_turningLastPosition = currentPosition;
     }

@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
     }
 
     private void driveWithJoystick(boolean fieldRelative) {
+        m_swerve.print();
         // Get the x speed. We are inverting this because Xbox controllers return
         // negative values when we push forward.
         final var xSpeed = -m_xspeedLimiter
