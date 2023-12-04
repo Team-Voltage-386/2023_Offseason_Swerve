@@ -27,8 +27,8 @@ public class SwerveModule {
     private static final double kWheelRadius = Units.inchesToMeters(2);
     private static final int kEncoderResolution = 4096;
 
-    private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularSpeed;
-    private static final double kModuleMaxAngularAcceleration = 2 * Math.PI; // radians per second squared
+    private static final double kModuleMaxAngularVelocity = 8*Math.PI;
+    private static final double kModuleMaxAngularAcceleration = 20*Math.PI; // radians per second squared this was 2PI
 
     /**
      * The drive motor is responsible for the actual power across the ground e.g. to
@@ -113,7 +113,7 @@ public class SwerveModule {
                 steerPID[1],
                 steerPID[2],
                 new TrapezoidProfile.Constraints(
-                        30*kModuleMaxAngularVelocity, 30*kModuleMaxAngularAcceleration)); //dramatically increased max velo
+                        kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 
         m_swerveModuleName = swerveModuleID;
 
@@ -259,7 +259,7 @@ public class SwerveModule {
         // this.resetDriveError();
         // }
 
-        double currentMPS = m_driveMotor.getEncoder().getVelocity() * kWheelRadius * Math.PI / 30;
+        double currentMPS = m_driveMotor.getEncoder().getVelocity() * kEncoderConversionMetersPerRotation; // * kWheelRadius * Math.PI / 30; 
 
         // Calculate the drive output from the drive PID controller.
         final double driveOutput = m_drivePIDController.calculate(currentMPS,

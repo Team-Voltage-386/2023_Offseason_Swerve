@@ -42,7 +42,7 @@ public class Constants {
         public static final double[] turnPID = { 11.25, 0.0, 0.0 }; // p = 11.25
         public static final double[] drivePID = { 0, 0.0, 0.0 }; //p = 0.825
         public static final double[] turnFeedForward = { 0.0, 0.46 }; //was 0.45
-        public static final double[] driveFeedForward = { 0.0, 0.405 }; // v = 0.405
+        public static final double[] driveFeedForward = { 0.0, 3.3}; // v = 0.405
     };
 
     public static class Controller {
