@@ -122,6 +122,7 @@ public class SwerveModule {
          */
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_driveMotor.getEncoder().setPosition(0);
+        m_driveMotor.setSmartCurrentLimit(40);
         // m_driveMotor.getEncoder().setPositionConversionFactor(kEncoderConversionMetersPerRotation);
         // m_driveMotor.getEncoder().setVelocityConversionFactor(kEncoderConversionMetersPerRotation);
 
@@ -131,6 +132,7 @@ public class SwerveModule {
          */
         m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
         m_turningMotor.setInverted(true);
+        m_turningMotor.setSmartCurrentLimit(40);
 
         /*
          * Set up and configure the turning encoder. Additional config is required to
