@@ -22,7 +22,7 @@ import frc.robot.Constants.DriveTrain;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-    public static final double kMaxSpeed = 4.0; // meters per second (could be 3 (was for other robot) when not testing)
+    public static final double kMaxPossibleSpeed = 3.0; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = 3*Math.PI; // 1/2 rotation per second
 
     private final Translation2d m_frontLeftLocation = new Translation2d(
@@ -37,8 +37,6 @@ public class Drivetrain {
     private final Translation2d m_backRightLocation = new Translation2d(
             DriveTrain.kDistanceMiddleToFrontMotor * DriveTrain.kXBackward,
             DriveTrain.kDistanceMiddleToSideMotor * DriveTrain.kYRight);
-
-    private final double[] kSwerveTurnPID = new double[] { 0.0, 0.0, 0.0 };
 
     private final SwerveModule m_frontLeft = new SwerveModule("FrontLeft", ID.kFrontLeftDrive, ID.kFrontLeftTurn,
             ID.kFrontLeftCANCoder, Offsets.kFrontLeftOffset,
@@ -89,6 +87,7 @@ public class Drivetrain {
             });
 
             private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
+        private Pose2d robotFieldPosition = getRoboPose2d();
 
     public Drivetrain() {
         // Zero at beginning of match to know what way is forward
@@ -135,7 +134,7 @@ public class Drivetrain {
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getGyroYawRotation2d())
                         : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)); // ADD WHEN WPILIB UPDATE: ChassisSpeeds.fromRobotRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getGyroYawRotation2d());
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxPossibleSpeed);
 
         // passing back the math from kinematics to the swerves themselves.
         m_frontLeft.setDesiredState(swerveModuleStates[0]);
@@ -149,6 +148,10 @@ public class Drivetrain {
         SmartDashboard.putNumber("desired Y Speed", ySpeed);
         SmartDashboard.putNumber("desired Rot Speed", rotSpeed);
         updateOdometry();
+    }
+
+    public Pose2d getRoboPose2d() {
+        return m_odometry.getPoseMeters();
     }
 
     public Pose2d calcRoboPose2dWithVision(double length, double angle1, double angle2) {
@@ -195,5 +198,8 @@ public class Drivetrain {
         SmartDashboard.putNumber("real X speed", forward);
         SmartDashboard.putNumber("real Y speed", sideways);
         SmartDashboard.putNumber("real Rot speed", Math.toDegrees(angular));
+        SmartDashboard.putNumber("real X Pos", robotFieldPosition.getX());
+        SmartDashboard.putNumber("real Y Pos", robotFieldPosition.getY());
+        SmartDashboard.putNumber("real Rot", robotFieldPosition.getRotation().getDegrees());
     }
 }

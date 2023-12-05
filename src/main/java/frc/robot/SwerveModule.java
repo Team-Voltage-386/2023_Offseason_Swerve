@@ -233,11 +233,11 @@ public class SwerveModule {
         double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
         double FFVal = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration);
 
-        SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Velocity", targetVelocity);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
-        SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", this.getActualTurningPosition());
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Velocity", targetVelocity);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", this.getActualTurningPosition());
         m_turningMotor.setVoltage(
                 pidVal
                 + FFVal);
@@ -298,23 +298,20 @@ public class SwerveModule {
         // m_turningMotor.set(turnOutput); // + turnFeedforward);
 
         this.goToPosition(state.angle.getRadians());
-
-        // SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position",
-        // getActualTurningPosition());
-        // SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position",
-        // state.angle.getRadians());
-        // SmartDashboard.putNumber(m_swerveModuleName + " Drive Output", driveOutput);
-        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output", turnOutput);
-        SmartDashboard.putNumber(m_swerveModuleName + " Drive Actual Velocity", currentMPS);
-        SmartDashboard.putNumber(m_swerveModuleName + " Drive Target Velocity", state.speedMetersPerSecond);
     }
 
     /**
      * Put info on smart dashboard
      */
     public void print() {
-
-
-        SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
+        //SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position", getActualTurningPosition());
+        // SmartDashboard.putNumber(m_swerveModuleName + " Actual Turning Position",
+        // getActualTurningPosition());
+        // SmartDashboard.putNumber(m_swerveModuleName + " Target Turning Position",
+        // state.angle.getRadians());
+        // SmartDashboard.putNumber(m_swerveModuleName + " Drive Output", driveOutput);
+        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output", turnOutput);
+        // SmartDashboard.putNumber(m_swerveModuleName + " Drive Actual Velocity", currentMPS);
+        // SmartDashboard.putNumber(m_swerveModuleName + " Drive Target Velocity", state.speedMetersPerSecond);
     }
 }

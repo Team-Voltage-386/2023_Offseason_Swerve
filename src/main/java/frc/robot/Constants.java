@@ -54,6 +54,7 @@ public class Constants {
         public static final double kRateLimitXSpeed = 100.0;
         public static final double kRateLimitYSpeed = 100.0;
         public static final double kRateLimitRot = 100.0;
+        public static final double kMaxNecessarySpeed = Drivetrain.kMaxPossibleSpeed*0.7;
     }
 
     public static class Offsets {
