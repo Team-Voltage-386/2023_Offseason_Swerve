@@ -180,16 +180,18 @@ public class Drivetrain {
                         m_backLeft.getPosition(),
                         m_backRight.getPosition()
                 });
+
+        //getting velocity vectors from each module
         var frontLeftState = m_frontLeft.getState();
         var frontRightState = m_frontRight.getState();
         var backLeftState = m_backLeft.getState();
         var backRightState = m_backRight.getState();
 
-        // Convert to chassis speeds
+        // Converting module speeds to chassis speeds
         m_chassisSpeeds = m_kinematics.toChassisSpeeds(
         frontLeftState, frontRightState, backLeftState, backRightState);
 
-        // Getting individual speeds
+        // Getting X Y R vector speeds
         double forward = m_chassisSpeeds.vxMetersPerSecond;
         double sideways = m_chassisSpeeds.vyMetersPerSecond;
         double angular = m_chassisSpeeds.omegaRadiansPerSecond;
