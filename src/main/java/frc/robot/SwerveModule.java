@@ -9,7 +9,6 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -19,13 +18,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.Modules;
 
 public class SwerveModule {
-    private static final double kWheelRadius = Units.inchesToMeters(2);
     private static final int kEncoderResolution = 4096;
 
     private static final double kModuleMaxAngularVelocity = 8*Math.PI;
@@ -61,7 +58,7 @@ public class SwerveModule {
      */
     private final CANCoder m_turningEncoder;
 
-    private static final double kEncoderConversionMetersPerRotation = 0.000745;
+    //private static final double kEncoderConversionMetersPerRotation = 0.000745;
 
     /**
      * Identification for what motor this is
