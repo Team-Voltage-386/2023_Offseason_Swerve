@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+
 public class Constants {
     public static class ID {
         // Swerve motor controller IDs
@@ -44,6 +46,13 @@ public class Constants {
         public static final double[] turnFeedForward = { 0.0, 0.46 }; //was 0.45
         public static final double[] driveFeedForward = { 0.0, 3.3}; // v = 0.405
     };
+
+    public static final class Modules {
+        public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
+        public static final double kDriveMotorGearRatio = 1 / 6.75; //check 0 to auto for this (lucas will understand)
+        public static final double kDriveEncoderRot2Meter = kDriveMotorGearRatio * Math.PI * kWheelDiameterMeters;
+        public static final double kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter / 60;
+    }
 
     public static class Controller {
         public static final int kDriveController = 0;

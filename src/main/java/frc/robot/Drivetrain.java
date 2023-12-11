@@ -86,7 +86,7 @@ public class Drivetrain {
                     m_backRight.getPosition()
             });
 
-            private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
+        private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
         private Pose2d robotFieldPosition = getRoboPose2d();
 
     public Drivetrain() {
@@ -180,7 +180,6 @@ public class Drivetrain {
                         m_backLeft.getPosition(),
                         m_backRight.getPosition()
                 });
-
         var frontLeftState = m_frontLeft.getState();
         var frontRightState = m_frontRight.getState();
         var backLeftState = m_backLeft.getState();
@@ -198,7 +197,7 @@ public class Drivetrain {
         SmartDashboard.putNumber("real X speed", forward);
         SmartDashboard.putNumber("real Y speed", sideways);
         SmartDashboard.putNumber("real Rot speed", Math.toDegrees(angular));
-        SmartDashboard.putNumber("real X Pos", robotFieldPosition.getX());
+        SmartDashboard.putNumber("real X Pos", m_odometry.getPoseMeters().getX());
         SmartDashboard.putNumber("real Y Pos", robotFieldPosition.getY());
         SmartDashboard.putNumber("real Rot", robotFieldPosition.getRotation().getDegrees());
     }

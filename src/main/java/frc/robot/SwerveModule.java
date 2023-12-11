@@ -22,6 +22,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.Modules;
 
 public class SwerveModule {
     private static final double kWheelRadius = Units.inchesToMeters(2);
@@ -123,8 +124,8 @@ public class SwerveModule {
         m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
         m_driveMotor.getEncoder().setPosition(0);
         m_driveMotor.setSmartCurrentLimit(40);
-        // m_driveMotor.getEncoder().setPositionConversionFactor(kEncoderConversionMetersPerRotation);
-        // m_driveMotor.getEncoder().setVelocityConversionFactor(kEncoderConversionMetersPerRotation);
+        m_driveMotor.getEncoder().setPositionConversionFactor(Modules.kDriveEncoderRot2Meter);
+        m_driveMotor.getEncoder().setVelocityConversionFactor(Modules.kDriveEncoderRPM2MeterPerSec);
 
         /*
          * Set up the turning motor. We had to invert the turning motor so it agreed
@@ -183,9 +184,6 @@ public class SwerveModule {
                 new Rotation2d(getActualTurningPosition()));
     }
 
-    // getActualDrivePosition with math instead of the drive conversion. should
-    // output same thing if conversion is tuned. disable PosConversion in
-    // constructor.
     /**
      * Returns the distance the wheel thinks it has gone across the floor. We use
      * math here instead of built-in drive conversion for ease of use
@@ -193,7 +191,7 @@ public class SwerveModule {
      * @return distance wheel has gone across the floor. (Circumference*rotations)
      */
     public double getActualDrivePosition() {
-        return m_driveMotor.getEncoder().getPosition() * 2 * Math.PI * kWheelRadius;
+        return m_driveMotor.getEncoder().getPosition(); //USING CONVERSION FACTOR IN MODULE CONSTANTS
     }
 
     /**
@@ -221,14 +219,38 @@ public class SwerveModule {
     // Controls a simple motor's position using a SimpleMotorFeedforward
     // and a ProfiledPIDController
     public void goToPosition(double goalPosition) {
-        double acceleration = (m_turningPIDController.getSetpoint().velocity - this.m_turningLastSpeed)
+        // double acceleration = (m_turningPIDController.getSetpoint().velocity - this.m_turningLastSpeed)
+        //         / (Timer.getFPGATimestamp() - this.m_turningLastTime);
+
+        // double currentPosition = this.getActualTurningPosition();
+
+        // double targetVelocity = m_turningPIDController.getSetpoint().velocity;
+        // double actualVelocity = (currentPosition - this.m_turningLastPosition)
+        //         / (Timer.getFPGATimestamp() - this.m_turningLastTime); //why not just use m_turningencoder.getVelocity now that we have conversion factors?
+
+        // double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
+        // double FFVal = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration);
+
+        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Velocity", targetVelocity);
+        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
+        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
+        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
+        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", this.getActualTurningPosition());
+        // m_turningMotor.setVoltage(
+        //         pidVal
+        //         + FFVal);
+        // this.m_turningLastSpeed = actualVelocity;
+        // this.m_turningLastTime = Timer.getFPGATimestamp();
+        // this.m_turningLastPosition = currentPosition;
+
+        
+        double targetVelocity = m_turningPIDController.getSetpoint().velocity;
+        double acceleration = (targetVelocity - this.m_turningLastSpeed)
                 / (Timer.getFPGATimestamp() - this.m_turningLastTime);
 
         double currentPosition = this.getActualTurningPosition();
 
-        double targetVelocity = m_turningPIDController.getSetpoint().velocity;
-        double actualVelocity = (currentPosition - this.m_turningLastPosition)
-                / (Timer.getFPGATimestamp() - this.m_turningLastTime);
+        double actualVelocity = m_turningEncoder.getVelocity(); //why not just use m_turningencoder.getVelocity now that we have conversion factors?
 
         double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
         double FFVal = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration);
@@ -261,38 +283,16 @@ public class SwerveModule {
         // this.resetDriveError();
         // }
 
-        double currentMPS = m_driveMotor.getEncoder().getVelocity() * kEncoderConversionMetersPerRotation; // * kWheelRadius * Math.PI / 30; 
+        double currentMPS = m_driveMotor.getEncoder().getVelocity(); //fixed with conversion
 
         // Calculate the drive output from the drive PID controller.
         final double driveOutput = m_drivePIDController.calculate(currentMPS,
                 state.speedMetersPerSecond);
 
-        // Calculate the turning motor output from the turning PID controller.
-        // double turnOutput = m_turningPIDController.calculate(
-        // getActualTurningPosition(),
-        // state.angle.getRadians());
-
-        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output Before Mod",
-        // turnOutput);
-        // Limit turn output between -1 and 1 for turning motor
-        // if (turnOutput < -1) {
-        // turnOutput = -1.0;
-        // }
-        // if (turnOutput > 1) {
-        // turnOutput = 1.0;
-        // }
-        // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output After Mod",
-        // turnOutput);
-
         // Left in from the example code we adapted, this is not required for actual use
         // but is left in case you want to try using it
         final double driveFeedforward =
         m_driveFeedforward.calculate(state.speedMetersPerSecond);
-
-        // Left in from the example code we adapted, this is not required for actual use
-        // but is left in case you want to try using it
-        // final double turnFeedforward =
-        // m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
 
         m_driveMotor.setVoltage(driveOutput+ driveFeedforward);
         // m_turningMotor.set(turnOutput); // + turnFeedforward);
