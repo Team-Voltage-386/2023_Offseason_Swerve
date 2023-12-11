@@ -216,31 +216,6 @@ public class SwerveModule {
     // Controls a simple motor's position using a SimpleMotorFeedforward
     // and a ProfiledPIDController
     public void goToPosition(double goalPosition) {
-        // double acceleration = (m_turningPIDController.getSetpoint().velocity - this.m_turningLastSpeed)
-        //         / (Timer.getFPGATimestamp() - this.m_turningLastTime);
-
-        // double currentPosition = this.getActualTurningPosition();
-
-        // double targetVelocity = m_turningPIDController.getSetpoint().velocity;
-        // double actualVelocity = (currentPosition - this.m_turningLastPosition)
-        //         / (Timer.getFPGATimestamp() - this.m_turningLastTime); //why not just use m_turningencoder.getVelocity now that we have conversion factors?
-
-        // double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
-        // double FFVal = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration);
-
-        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Velocity", targetVelocity);
-        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
-        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
-        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
-        // // SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", this.getActualTurningPosition());
-        // m_turningMotor.setVoltage(
-        //         pidVal
-        //         + FFVal);
-        // this.m_turningLastSpeed = actualVelocity;
-        // this.m_turningLastTime = Timer.getFPGATimestamp();
-        // this.m_turningLastPosition = currentPosition;
-
-        
         double targetVelocity = m_turningPIDController.getSetpoint().velocity;
         double acceleration = (targetVelocity - this.m_turningLastSpeed)
                 / (Timer.getFPGATimestamp() - this.m_turningLastTime);
@@ -252,11 +227,6 @@ public class SwerveModule {
         double pidVal = m_turningPIDController.calculate(this.getActualTurningPosition(), goalPosition);
         double FFVal = m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity, acceleration);
 
-        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Velocity", targetVelocity);
-        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
-        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
-        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
-        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", this.getActualTurningPosition());
         m_turningMotor.setVoltage(
                 pidVal
                 + FFVal);
@@ -310,5 +280,10 @@ public class SwerveModule {
         // SmartDashboard.putNumber(m_swerveModuleName + " Turning Output", turnOutput);
         // SmartDashboard.putNumber(m_swerveModuleName + " Drive Actual Velocity", currentMPS);
         // SmartDashboard.putNumber(m_swerveModuleName + " Drive Target Velocity", state.speedMetersPerSecond);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Velocity", targetVelocity);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Actual Velocity", actualVelocity);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Output Voltage", pidVal + FFVal);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Target Position", goalPosition);
+        // SmartDashboard.putNumber(this.m_swerveModuleName + " T Turning Position", this.getActualTurningPosition());
     }
 }

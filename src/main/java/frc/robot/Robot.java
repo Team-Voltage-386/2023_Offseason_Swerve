@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
         
 
         if (m_controller.getRightBumperPressed()) {
-            m_swerve.resetGyro();
+            m_swerve.resetOdo();
         }
     }
 }

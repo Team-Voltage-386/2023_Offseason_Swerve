@@ -13,3 +13,7 @@ If you replace one, you will HAVE to update a set of things in the code. We stor
     2. Take the values from Smart Dashboard (which should include the CANCoder readings) and plug them into the encoder offsets in Constants. Make sure that you are using the correct units (radians) and that the values are in the correct range (-PI to PI).
 3. Make sure the **Turning Encoder** direction matches the **Turning Motor** direction
     * If you notice that the swerve module oscillates irregularly especially with no input and if it's not chasing the target value, this could be the cause i.e. that the encoder and motor disagree about which direction is positive.
+## Tuning
+### P (Power)
+1. always start on a very low P value. usually 0.01 is a good bet. depending on how large you expect the error to be, 0.1 may be acceptable.
+2. 
