@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ID;
 import frc.robot.Constants.Offsets;
 import frc.robot.Constants.DriveTrain;
@@ -167,6 +169,33 @@ public class Drivetrain {
     public Pose2d getRoboPose2d() {
         return m_odometry.getPoseMeters();
     }
+
+    // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
+        // https://github.com/HighlanderRobotics/Rapid-React/blob/main/src/main/java/frc/robot/subsystems/DrivetrainSubsystem.java
+        public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+                return new SequentialCommandGroup(
+                        new InstantCommand(() -> {
+                        // Reset odometry for the first path you run during auto
+                        if(isFirstPath){
+                                this.resetOdometry(traj.getInitialHolonomicPose());
+                        }
+                        }),
+                        new PPSwerveControllerCommand(
+                                traj, 
+                                () -> m_odometry.getPoseMeters(), // Pose supplier
+                                this.m_kinematics, // SwerveDriveKinematics
+                                new PIDController(0.5, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                                new PIDController(0.5, 0, 0), // Y controller (usually the same values as X controller)
+                                new PIDController(0.5, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                                (SwerveModuleState[] states) -> { // Consumes the module states to set the modules moving in the directions we want
+                                        m_chassisSpeeds = m_kinematics.toChassisSpeeds(states);
+                                        setModuleStates(states);
+                                }, // Module states consumer
+                                true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+                                this // Requires this drive subsystem
+                        )
+                );
+        }
 
     public Pose2d calcRoboPose2dWithVision(double length, double angle1, double angle2) {
         double L = length; //dist between the two april tags
