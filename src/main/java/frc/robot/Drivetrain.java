@@ -22,12 +22,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ID;
 import frc.robot.Constants.Offsets;
 import frc.robot.Constants.DriveTrain;
 
 /** Represents a swerve drive style drivetrain. */
-public class Drivetrain {
+public class Drivetrain extends SubsystemBase{
     public static final double kMaxPossibleSpeed = 3.0; // meters per second (could be 3 (was for other robot) when not testing)
     public static final double kMaxAngularSpeed = 3*Math.PI; // 1/2 rotation per second
 
@@ -173,6 +174,13 @@ public class Drivetrain {
         SmartDashboard.putNumber("desired Y Speed", ySpeed);
         SmartDashboard.putNumber("desired Rot Speed", rotSpeed);
         updateOdometry();
+    }
+
+    public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
+        m_frontLeft.setDesiredState(swerveModuleStates[0]);
+        m_frontRight.setDesiredState(swerveModuleStates[1]);
+        m_backLeft.setDesiredState(swerveModuleStates[2]);
+        m_backRight.setDesiredState(swerveModuleStates[3]);
     }
 
     public Pose2d getRoboPose2d() {
