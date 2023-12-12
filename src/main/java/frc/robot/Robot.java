@@ -4,11 +4,14 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathPlanner;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.Deadbands;
 import frc.robot.Constants.Controller;;
 
@@ -24,14 +27,16 @@ public class Robot extends TimedRobot {
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(Controller.kRateLimitYSpeed);
     private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(Controller.kRateLimitRot);
 
+    Command path1 = m_swerve.followTrajectoryCommand(PathPlanner.loadPath("Path 1", 5, 5, false), true);
+
     @Override
     public void robotInit() {
-
+        
     }
 
     @Override
     public void autonomousInit() {
-        m_swerve.followTrajectoryCommand(null, isAutonomous());
+        path1.schedule();
     }
 
     @Override
@@ -41,7 +46,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-
+        path1.cancel();
     }
 
     @Override
