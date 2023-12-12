@@ -6,7 +6,9 @@ package frc.robot;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,6 +20,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ID;
 import frc.robot.Constants.Offsets;
 import frc.robot.Constants.DriveTrain;
@@ -107,6 +111,11 @@ public class Drivetrain {
         m_odometry.resetPosition(getGyroYawRotation2d(), getModulePositions(), robotFieldPosition);
     }
 
+    //CHECK IF THIS WORKS CORRECTLY
+    public void resetOdo(Pose2d pose) {
+        m_odometry.resetPosition(getGyroYawRotation2d(), getModulePositions(), pose);
+    }
+
     public SwerveModulePosition[] getModulePositions() {
         return new SwerveModulePosition[] {
                 m_frontLeft.getPosition(),
@@ -177,7 +186,7 @@ public class Drivetrain {
                         new InstantCommand(() -> {
                         // Reset odometry for the first path you run during auto
                         if(isFirstPath){
-                                this.resetOdometry(traj.getInitialHolonomicPose());
+                                this.resetOdo(traj.getInitialHolonomicPose());
                         }
                         }),
                         new PPSwerveControllerCommand(
