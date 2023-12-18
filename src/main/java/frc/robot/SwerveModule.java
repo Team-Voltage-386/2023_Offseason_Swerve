@@ -241,14 +241,9 @@ public class SwerveModule {
      * @param desiredState Desired state with speed and angle.
      */
     public void setDesiredState(SwerveModuleState desiredState) {
-        // Optimize the reference state to avoid spinning further than 90 degrees or
-        // PI/2 radians
+        // Optimize the reference state to avoid spinning further than 90 degrees or PI/2 radians
         SwerveModuleState state = SwerveModuleState.optimize(desiredState,
                 new Rotation2d(getActualTurningPosition()));
-
-        // if (state.speedMetersPerSecond < 0.05) {
-        // this.resetDriveError();
-        // }
 
         double currentMPS = m_driveMotor.getEncoder().getVelocity(); //fixed with conversion
 
@@ -256,14 +251,13 @@ public class SwerveModule {
         final double driveOutput = m_drivePIDController.calculate(currentMPS,
                 state.speedMetersPerSecond);
 
-        // Left in from the example code we adapted, this is not required for actual use
-        // but is left in case you want to try using it
+        //Feedforward controller (See README) todo
         final double driveFeedforward =
         m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
-        m_driveMotor.setVoltage(driveOutput+ driveFeedforward);
-        // m_turningMotor.set(turnOutput); // + turnFeedforward);
+        m_driveMotor.setVoltage(driveOutput + driveFeedforward);
 
+        //Handles module orientation (steer motor controls)
         this.goToPosition(state.angle.getRadians());
     }
 
