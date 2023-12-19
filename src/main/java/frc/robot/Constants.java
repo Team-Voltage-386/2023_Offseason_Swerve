@@ -42,9 +42,9 @@ public class Constants {
         public static final int kYRight = -1;
 
         public static final double[] turnPID = { 11.25, 0.0, 0.0 }; // p = 11.25
-        public static final double[] drivePID = { 0, 0.0, 0.0 }; //p = 0.825
+        public static final double[] drivePID = { 0.4, 0.0, 0.0 }; //p = 0.825
         public static final double[] turnFeedForward = { 0.0, 0.46 }; //was 0.45
-        public static final double[] driveFeedForward = { 0.0, 3.3}; // v = 0.405
+        public static final double[] driveFeedForward = { 0.0, 2.85}; // v = 0.405
     };
 
     public static final class Modules {
@@ -63,7 +63,7 @@ public class Constants {
         public static final double kRateLimitXSpeed = 100.0;
         public static final double kRateLimitYSpeed = 100.0;
         public static final double kRateLimitRot = 100.0;
-        public static final double kMaxNecessarySpeed = Drivetrain.kMaxPossibleSpeed*0.7;
+        public static final double kMaxNecessarySpeed = 1.0; //Drivetrain.kMaxPossibleSpeed*0.7;
     }
 
     public static class Offsets {

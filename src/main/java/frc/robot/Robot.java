@@ -8,6 +8,7 @@ import com.pathplanner.lib.PathPlanner;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,7 +28,7 @@ public class Robot extends TimedRobot {
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(Controller.kRateLimitYSpeed);
     private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(Controller.kRateLimitRot);
 
-    Command path1 = m_swerve.followTrajectoryCommand(PathPlanner.loadPath("Path 1", 5, 5, false), true);
+    Command path = m_swerve.followTrajectoryCommand(PathPlanner.loadPath("New Path", 0.4, 1.0, false), true);
 
     @Override
     public void robotInit() {
@@ -36,17 +37,19 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        path1.schedule();
+        path.schedule();
     }
 
     @Override
     public void autonomousPeriodic() {
-        driveWithJoystick(false);
+        //driveWithJoystick(false);
+        m_swerve.updateOdometry();
+        path.execute();
     }
 
     @Override
     public void teleopInit() {
-        path1.cancel();
+        path.cancel();
     }
 
     @Override
@@ -89,7 +92,7 @@ public class Robot extends TimedRobot {
         
 
         if (m_controller.getRightBumperPressed()) {
-            m_swerve.resetOdo();
+            m_swerve.resetOdo(new Pose2d());
         }
     }
 }

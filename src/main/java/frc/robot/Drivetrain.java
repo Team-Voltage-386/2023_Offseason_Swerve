@@ -108,7 +108,6 @@ public class Drivetrain extends SubsystemBase{
     }
 
     public void resetOdo() {
-        resetGyro();
         m_odometry.resetPosition(getGyroYawRotation2d(), getModulePositions(), robotFieldPosition);
     }
 
