@@ -49,16 +49,16 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void teleopInit() {
+        path.cancel();
+    }
+
+    @Override
     public void autonomousPeriodic() {
         //driveWithJoystick(false);
         m_swerve.updateOdometry();
         path.execute();
-    }
-
-    @Override
-    public void teleopInit() {
-        path.cancel();
-    }
+    } 
 
     @Override
     public void teleopPeriodic() {
